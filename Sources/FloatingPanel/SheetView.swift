@@ -11,7 +11,7 @@ extension View {
         position: SheetView<T>.CardPosition = .tall,
         dismissable: Bool = false,
         onDismiss: (() -> Void)? = nil,
-//        allowedPosition: [SheetView<T>.CardPosition] = [.tall, .compact, .short],
+        allowedPositions: [SheetView<T>.CardPosition] = [.tall, .compact, .short],
         content: @escaping () -> T
     ) -> some View {
         self.modifier(SheetViewModifier(
@@ -19,7 +19,7 @@ extension View {
             isShow: { isPresented.wrappedValue },
             dismissable: dismissable,
             onDismiss: onDismiss,
-//            allowedPosition: allowedPosition,
+            allowedPositions: allowedPositions,
             content: content,
             done: { isPresented.wrappedValue = false }
         ))
@@ -37,7 +37,7 @@ struct SheetViewModifier<T: View>: ViewModifier {
     let dismissable: Bool
     let onDismiss: CB?
 
-//    let allowedPosition: [SheetView<T>.CardPosition]
+    let allowedPositions: [SheetView<T>.CardPosition]
 
     let content: () -> T
 
@@ -48,7 +48,11 @@ struct SheetViewModifier<T: View>: ViewModifier {
             content
 
             if isShow() {
-                SheetView(position: position, didClose: self.sheetOverCardDidClose(dismissable: dismissable)) {
+                SheetView(
+                    position: position,
+                    didClose: self.sheetOverCardDidClose(dismissable: dismissable),
+                    allowedPositions: allowedPositions
+                ) {
                     self.content()
                 }
                 .edgesIgnoringSafeArea(.all)
@@ -88,6 +92,8 @@ struct SheetView<Content: View>: View {
 
     /// return if close
     @State private var didTapTop: () -> Bool = { true }
+
+    let allowedPositions: [SheetView<Content>.CardPosition]
 
     var content: () -> Content
 
