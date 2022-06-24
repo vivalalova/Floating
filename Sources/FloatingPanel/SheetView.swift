@@ -6,33 +6,22 @@ import SwiftUI
 
 public
 extension View {
-    func sheetOver<T: View>(isPresented: Binding<Bool>,
-                            position: SheetView<T>.CardPosition = .tall,
-                            dismissable: Bool = false,
-                            onDismiss: (() -> Void)? = nil,
-                            content: @escaping () -> T) -> some View {
+    func sheetOver<T: View>(
+        isPresented: Binding<Bool>,
+        position: SheetView<T>.CardPosition = .tall,
+        dismissable: Bool = false,
+        onDismiss: (() -> Void)? = nil,
+//        allowedPosition: [SheetView<T>.CardPosition] = [.tall, .compact, .short],
+        content: @escaping () -> T
+    ) -> some View {
         self.modifier(SheetViewModifier(
             position: position,
             isShow: { isPresented.wrappedValue },
             dismissable: dismissable,
             onDismiss: onDismiss,
+//            allowedPosition: allowedPosition,
             content: content,
             done: { isPresented.wrappedValue = false }
-        ))
-    }
-
-    func sheetOver<T: View, F: Any>(item: Binding<F?>,
-                                    position: SheetView<T>.CardPosition = .tall,
-                                    dismissable: Bool = false,
-                                    onDismiss: (() -> Void)? = nil,
-                                    content: @escaping (F) -> T) -> some View {
-        self.modifier(SheetViewModifier(
-            position: position,
-            isShow: { item.wrappedValue != nil },
-            dismissable: dismissable,
-            onDismiss: onDismiss,
-            content: { content(item.wrappedValue!) },
-            done: { item.wrappedValue = nil }
         ))
     }
 }
@@ -47,6 +36,9 @@ struct SheetViewModifier<T: View>: ViewModifier {
 
     let dismissable: Bool
     let onDismiss: CB?
+
+//    let allowedPosition: [SheetView<T>.CardPosition]
+
     let content: () -> T
 
     let done: CB
@@ -108,12 +100,14 @@ struct SheetView<Content: View>: View {
         GeometryReader { reader in
             VStack(spacing: 0) { // card
                 VStack(spacing: 0) {
-                    Indicator()
                     self.content()
+                        .overlay(TopBar(), alignment: .top)
                     Spacer()
                 }
-                .frame(width: UIScreen.main.bounds.size.width,
-                       height: reader.size.height - self.position.distance(readerHeight: reader.size.height))
+                .frame(
+                    width: UIScreen.main.bounds.size.width,
+                    height: reader.size.height - self.position.distance(readerHeight: reader.size.height)
+                )
 
                 Spacer()
             }
@@ -264,21 +258,21 @@ extension SheetView {
 
 private
 extension SheetView {
-    private struct Indicator: View {
-        let handleThickness: CGFloat = 5.0
-
+    private struct TopBar: View {
         var body: some View {
             Color.secondary
-                .cornerRadius(handleThickness / 2.0)
-                .frame(width: 40, height: handleThickness)
+                .frame(width: 40, height: 5.0)
+                .clipShape(Capsule())
                 .padding(5)
         }
     }
 
     private func background(proxy: GeometryProxy) -> some View {
         Color.black
-            .offset(x: self.offset(proxy: proxy).x,
-                    y: self.offset(proxy: proxy).y)
+            .offset(
+                x: self.offset(proxy: proxy).x,
+                y: self.offset(proxy: proxy).y
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
@@ -304,27 +298,56 @@ struct SheetOverCard_Previews: PreviewProvider {
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(isPresented: self.$model.isPresented, position: .tall) {
-                    Text("Bar")
+                    NavigationView {
+                        List {
+                            Group {
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                            }
+                            Group {
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                                Text("hihi")
+                            }
+                        }
+                        .navigationTitle("hihihihi")
+                    }
                 }
 
             ZStack {
                 Color.red
                     .edgesIgnoringSafeArea(.all)
                     .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
-                        Text("Bar")
+                        List {
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                        }
                     }
 
                 Button("oooo") {
                     self.model.isPresented.toggle()
                 }
             }
-//
-//            Color.red
-//                .edgesIgnoringSafeArea(.all)
-//                .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
-//                    Text("Bar")
-//                }
-//                .previewDevice("iPad mini (5th generation)")
         }
     }
 }
