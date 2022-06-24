@@ -56,11 +56,10 @@ struct SheetViewModifier<T: View>: ViewModifier {
             content
 
             if isShow() {
-                SheetView(position: position, didClose: self.sheetOverCardDidClose(dismissable: dismissable))
-                    {
-                        self.content()
-                    }
-                    .edgesIgnoringSafeArea(.all)
+                SheetView(position: position, didClose: self.sheetOverCardDidClose(dismissable: dismissable)) {
+                    self.content()
+                }
+                .edgesIgnoringSafeArea(.all)
             }
         }
     }
@@ -302,16 +301,30 @@ struct SheetOverCard_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Color.red
+                .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(isPresented: self.$model.isPresented, position: .tall) {
                     Text("Bar")
                 }
 
-            Color.red
-                .edgesIgnoringSafeArea(.all)
-                .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
-                    Text("Bar")
+            ZStack {
+                Color.red
+                    .edgesIgnoringSafeArea(.all)
+                    .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
+                        Text("Bar")
+                    }
+
+                Button("oooo") {
+                    self.model.isPresented.toggle()
                 }
+            }
+//
+//            Color.red
+//                .edgesIgnoringSafeArea(.all)
+//                .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
+//                    Text("Bar")
+//                }
+//                .previewDevice("iPad mini (5th generation)")
         }
     }
 }
