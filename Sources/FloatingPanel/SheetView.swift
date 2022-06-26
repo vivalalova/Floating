@@ -74,15 +74,16 @@ struct SheetViewModifier<T: View>: ViewModifier {
 
 public
 struct SheetView<Content: View>: View {
-    @State var position: CardPosition {
-        didSet {
-            if self.position == .close {
-                withAnimation {
-                    self.forClose = 0
-                }
-            }
-        }
-    }
+    @State var position: CardPosition
+//    {
+//        didSet {
+//            if self.position == .close {
+//                withAnimation {
+//                    self.forClose = 0
+//                }
+//            }
+//        }
+//    }
 
     @State var didClose: (() -> Void)? = nil
     @State private var forClose = 1.0
@@ -107,9 +108,9 @@ struct SheetView<Content: View>: View {
             VStack(spacing: 0) { // card
                 VStack(spacing: 0) {
                     self.content()
-                        .overlay(TopBar(), alignment: .top)
                     Spacer()
                 }
+                .overlay(TopBar(), alignment: .top)
                 .frame(
                     width: UIScreen.main.bounds.size.width,
                     height: reader.size.height - self.position.distance(readerHeight: reader.size.height)
@@ -140,6 +141,8 @@ struct SheetView<Content: View>: View {
         case short
         case close
 
+        case custom(toTop: CGFloat)
+
         public
         func distance(readerHeight: CGFloat) -> CGFloat {
             switch self {
@@ -153,6 +156,8 @@ struct SheetView<Content: View>: View {
                 return readerHeight - 200
             case .close:
                 return readerHeight
+            case let .custom(toTop):
+                return toTop
             }
         }
     }
@@ -304,35 +309,37 @@ struct SheetOverCard_Previews: PreviewProvider {
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(isPresented: self.$model.isPresented, position: .tall) {
-                    NavigationView {
-                        List {
-                            Group {
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                            }
-                            Group {
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                                Text("hihi")
-                            }
+//                    NavigationView {
+//                        List {
+                    Group {
+                        Group {
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
                         }
-                        .navigationTitle("hihihihi")
+                        Group {
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                            Text("hihi")
+                        }
                     }
+//                        }
+//                        .navigationTitle("hihihihi")
+//                    }
                 }
 
             ZStack {
