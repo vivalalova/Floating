@@ -32,10 +32,7 @@ struct SheetViewModifier<T: View>: ViewModifier {
         ZStack {
             content
 
-            SheetView(
-                position: position,
-                allowedPositions: allowedPositions
-            ) {
+            SheetView(position: position, allowedPositions: allowedPositions) {
                 self.content()
             }
             .edgesIgnoringSafeArea(.all)
@@ -55,10 +52,6 @@ struct SheetView<Content: View>: View {
 //            }
 //        }
 //    }
-
-    @State var didClose: (() -> Void)? = nil
-    @State private var forClose = 1.0
-    var isCloseable: Bool { self.didClose != nil }
 
     @State private var animated = true
 
@@ -100,9 +93,9 @@ struct SheetView<Content: View>: View {
             .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
             .gesture(self.drag(readerHeight: reader.size.height))
             .background(self.background(proxy: reader))
-            .onAnimationCompleted(for: self.forClose) {
-                self.didClose?()
-            }
+//            .onAnimationCompleted(for: self.forClose) {
+//                self.didClose?()
+//            }
         }
     }
 
@@ -192,11 +185,7 @@ extension SheetView {
                 }
 
                 if verticalDirection > 0 { // 變矮
-                    if self.isCloseable {
-                        self.position = .close
-                    } else {
-                        self.position = toPosition
-                    }
+                    self.position = toPosition
                 } else if verticalDirection < 0 { // 變高
                     self.position = fromPosition
                 } else {
@@ -263,10 +252,7 @@ extension SheetView {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
-                let shouldClose = self.didTapTop()
-                if self.isCloseable && shouldClose {
-                    self.position = .close
-                }
+                print("maybe should close")
             }
             .edgesIgnoringSafeArea(.all)
     }
@@ -274,7 +260,7 @@ extension SheetView {
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var isPresented = true
+        @Published var position = SheetView<AnyView>.CardPosition.short
     }
 
     @StateObject static var model = Model()
@@ -286,33 +272,17 @@ struct SheetOverCard_Previews: PreviewProvider {
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(position: .tall) {
 //                    NavigationView {
-//                        List {
-
-                    Group {
-                        VStack {
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                        }
-                        VStack {
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                        }
+                    List {
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
                     }
                 }
 
@@ -330,10 +300,6 @@ struct SheetOverCard_Previews: PreviewProvider {
                             Text("hihi")
                         }
                     }
-
-                Button("oooo") {
-                    self.model.isPresented.toggle()
-                }
             }
         }
     }
