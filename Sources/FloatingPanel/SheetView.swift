@@ -4,41 +4,7 @@
 
 import SwiftUI
 
-public
-extension View {
-    func sheetOver<T: View>(
-        position: SheetView<T>.CardPosition = .tall,
-        allowedPositions: [SheetView<T>.CardPosition] = [.tall, .compact, .short],
-        content: @escaping () -> T
-    ) -> some View {
-        self.modifier(
-            SheetViewModifier(
-                position: position,
-                allowedPositions: allowedPositions,
-                content: content
-            )
-        )
-    }
-}
-
-public
-struct SheetViewModifier<T: View>: ViewModifier {
-    let position: SheetView<T>.CardPosition
-    let allowedPositions: [SheetView<T>.CardPosition]
-
-    let content: () -> T
-
-    public func body(content: Content) -> some View {
-        ZStack {
-            content
-
-            SheetView(position: position, allowedPositions: allowedPositions) {
-                self.content()
-            }
-            .edgesIgnoringSafeArea(.all)
-        }
-    }
-}
+public enum Floating {}
 
 public
 struct SheetView<Content: View>: View {
@@ -72,19 +38,17 @@ struct SheetView<Content: View>: View {
                     self.content()
                     Spacer()
                 }
-                .overlay(TopBar(), alignment: .top)
                 .frame(
-                    width: reader.size.width, // UIScreen.main.bounds.size.width,
-//                    height: reader.size.height - self.position.distance(readerHeight: reader.size.height)
+                    width: reader.size.width,
                     height: reader.size.height
                 )
 
                 Spacer()
             }
+            .overlay(TopBar(), alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-//            .offset(.init(width: 0, height: self.position.distance(readerHeight: reader.size.height)))
             .background(Color.white)
-            .cornerRadius(16.0)
+            .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
             .shadow(color: self.shadowColor, radius: 10.0)
             .offset(
                 x: self.offset(proxy: reader).x,
@@ -93,9 +57,6 @@ struct SheetView<Content: View>: View {
             .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
             .gesture(self.drag(readerHeight: reader.size.height))
             .background(self.background(proxy: reader))
-//            .onAnimationCompleted(for: self.forClose) {
-//                self.didClose?()
-//            }
         }
     }
 
@@ -105,7 +66,7 @@ struct SheetView<Content: View>: View {
         case tall
         case compact
         case short
-        case close
+        case closed
 
         case custom(toTop: CGFloat)
 
@@ -120,7 +81,7 @@ struct SheetView<Content: View>: View {
                 return readerHeight * 0.5
             case .short:
                 return readerHeight - 200
-            case .close:
+            case .closed:
                 return readerHeight
             case let .custom(toTop):
                 return toTop
@@ -236,7 +197,7 @@ private
 extension SheetView {
     private struct TopBar: View {
         var body: some View {
-            Color.secondary
+            Color.gray
                 .frame(width: 40, height: 5.0)
                 .clipShape(Capsule())
                 .padding(5)
@@ -260,7 +221,7 @@ extension SheetView {
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position = SheetView<AnyView>.CardPosition.short
+        @Published var position: SheetView<AnyView>.CardPosition = .short
     }
 
     @StateObject static var model = Model()
@@ -271,18 +232,13 @@ struct SheetOverCard_Previews: PreviewProvider {
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(position: .tall) {
-//                    NavigationView {
-                    List {
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
+                    NavigationView {
+                        List {
+                            ForEach(1 ..< 50) { _ in
+                                Text("hihi")
+                            }
+                        }
+                        .navigationTitle("hihihi")
                     }
                 }
 
@@ -300,6 +256,24 @@ struct SheetOverCard_Previews: PreviewProvider {
                             Text("hihi")
                         }
                     }
+            }
+
+            NavigationView {
+                List {
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                }
+            }.sheetOver(position: .tall) {
+                VStack {
+                    ForEach(1 ..< 50) { _ in
+                        Text("hihi")
+                    }
+                }
             }
         }
     }
