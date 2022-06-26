@@ -100,8 +100,6 @@ struct SheetView<Content: View>: View {
 
     @GestureState private var dragState = DragState.inactive
 
-    @State private var height: CGFloat = 0
-
     public
     var body: some View {
         GeometryReader { reader in
@@ -112,18 +110,22 @@ struct SheetView<Content: View>: View {
                 }
                 .overlay(TopBar(), alignment: .top)
                 .frame(
-                    width: UIScreen.main.bounds.size.width,
-                    height: reader.size.height - self.position.distance(readerHeight: reader.size.height)
+                    width: reader.size.width, // UIScreen.main.bounds.size.width,
+//                    height: reader.size.height - self.position.distance(readerHeight: reader.size.height)
+                    height: reader.size.height
                 )
 
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+//            .offset(.init(width: 0, height: self.position.distance(readerHeight: reader.size.height)))
             .background(Color.white)
             .cornerRadius(16.0)
             .shadow(color: self.shadowColor, radius: 10.0)
-            .offset(x: self.offset(proxy: reader).x,
-                    y: self.offset(readerHeight: reader.size.height))
+            .offset(
+                x: self.offset(proxy: reader).x,
+                y: self.offset(readerHeight: reader.size.height)
+            )
             .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
             .gesture(self.drag(readerHeight: reader.size.height))
             .background(self.background(proxy: reader))
@@ -194,7 +196,8 @@ extension SheetView {
                 state = .dragging(translation: drag.translation)
             }
             .onChanged { _ in
-                self.height = readerHeight - self.position.distance(readerHeight: readerHeight)
+                print("ooo")
+//                self.height = readerHeight - self.position.distance(readerHeight: readerHeight)
             }
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
@@ -237,8 +240,10 @@ extension SheetView {
             return 0
         }
 
-        let opacity = 0.6 * (1 - (self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height) / readerHeight)
-        return Double(opacity > 0.4 ? 0.4 : opacity)
+        let alpha: CGFloat = 0.6
+        let opacity: CGFloat = alpha * 1 - (self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height) / readerHeight
+
+        return Double(min(opacity, alpha))
     }
 
     private enum DragState {
@@ -305,14 +310,15 @@ struct SheetOverCard_Previews: PreviewProvider {
 
     static var previews: some View {
         Group {
-            Color.red
+            Color.green
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(isPresented: self.$model.isPresented, position: .tall) {
 //                    NavigationView {
 //                        List {
+
                     Group {
-                        Group {
+                        VStack {
                             Text("hihi")
                             Text("hihi")
                             Text("hihi")
@@ -324,7 +330,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                             Text("hihi")
                             Text("hihi")
                         }
-                        Group {
+                        VStack {
                             Text("hihi")
                             Text("hihi")
                             Text("hihi")
@@ -337,15 +343,17 @@ struct SheetOverCard_Previews: PreviewProvider {
                             Text("hihi")
                         }
                     }
-//                        }
-//                        .navigationTitle("hihihihi")
-//                    }
                 }
 
             ZStack {
                 Color.red
                     .edgesIgnoringSafeArea(.all)
-                    .sheetOver(isPresented: self.$model.isPresented, position: .short, dismissable: true) {
+                    .sheetOver(
+                        isPresented: self.$model.isPresented,
+                        position: .short,
+                        dismissable: true,
+                        allowedPositions: [.tall, .short]
+                    ) {
                         List {
                             Text("hihi")
                             Text("hihi")
