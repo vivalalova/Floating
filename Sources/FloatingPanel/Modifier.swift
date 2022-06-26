@@ -42,3 +42,9 @@ struct SheetViewModifier<T: View>: ViewModifier {
         }
     }
 }
+
+extension UIColor {
+    var color: Color {
+        Color(self)
+    }
+}

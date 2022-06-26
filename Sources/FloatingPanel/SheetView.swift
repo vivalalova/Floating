@@ -33,31 +33,34 @@ struct SheetView<Content: View>: View {
     public
     var body: some View {
         GeometryReader { reader in
+            let size = reader.size
+
             VStack(spacing: 0) { // card
                 VStack(spacing: 0) {
                     self.content()
                     Spacer()
                 }
                 .frame(
-                    width: reader.size.width,
-                    height: reader.size.height
+                    width: size.width,
+                    height: size.height
                 )
 
                 Spacer()
             }
             .overlay(TopBar(), alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.white)
+            .background(UIColor.systemBackground.color)
             .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
             .shadow(color: self.shadowColor, radius: 10.0)
             .offset(
                 x: self.offset(proxy: reader).x,
-                y: self.offset(readerHeight: reader.size.height)
+                y: self.offset(readerHeight: size.height)
             )
             .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
-            .gesture(self.drag(readerHeight: reader.size.height))
+            .gesture(self.drag(readerHeight: size.height))
             .background(self.background(proxy: reader))
         }
+        .border(Color.red, width: 5)
     }
 
     public
@@ -155,7 +158,6 @@ extension SheetView {
             }
     }
 
-    private typealias GestureCB = (DragGesture.Value) -> Void
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
         if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == CardPosition.short.distance(readerHeight: readerHeight) {
             return 0
@@ -177,15 +179,6 @@ extension SheetView {
                 return .zero
             case let .dragging(translation):
                 return translation
-            }
-        }
-
-        var isDragging: Bool {
-            switch self {
-            case .inactive:
-                return false
-            case .dragging:
-                return true
             }
         }
     }
