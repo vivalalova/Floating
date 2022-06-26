@@ -7,67 +7,38 @@ import SwiftUI
 public
 extension View {
     func sheetOver<T: View>(
-        isPresented: Binding<Bool>,
         position: SheetView<T>.CardPosition = .tall,
-        dismissable: Bool = false,
-        onDismiss: (() -> Void)? = nil,
         allowedPositions: [SheetView<T>.CardPosition] = [.tall, .compact, .short],
         content: @escaping () -> T
     ) -> some View {
-        self.modifier(SheetViewModifier(
-            position: position,
-            isShow: { isPresented.wrappedValue },
-            dismissable: dismissable,
-            onDismiss: onDismiss,
-            allowedPositions: allowedPositions,
-            content: content,
-            done: { isPresented.wrappedValue = false }
-        ))
+        self.modifier(
+            SheetViewModifier(
+                position: position,
+                allowedPositions: allowedPositions,
+                content: content
+            )
+        )
     }
 }
 
 public
 struct SheetViewModifier<T: View>: ViewModifier {
-    typealias CB = () -> Void
-
     let position: SheetView<T>.CardPosition
-
-    let isShow: () -> Bool
-
-    let dismissable: Bool
-    let onDismiss: CB?
-
     let allowedPositions: [SheetView<T>.CardPosition]
 
     let content: () -> T
-
-    let done: CB
 
     public func body(content: Content) -> some View {
         ZStack {
             content
 
-            if isShow() {
-                SheetView(
-                    position: position,
-                    didClose: self.sheetOverCardDidClose(dismissable: dismissable),
-                    allowedPositions: allowedPositions
-                ) {
-                    self.content()
-                }
-                .edgesIgnoringSafeArea(.all)
+            SheetView(
+                position: position,
+                allowedPositions: allowedPositions
+            ) {
+                self.content()
             }
-        }
-    }
-
-    private func sheetOverCardDidClose(dismissable: Bool) -> CB? {
-        guard dismissable else {
-            return nil
-        }
-
-        return {
-            self.done()
-            self.onDismiss?()
+            .edgesIgnoringSafeArea(.all)
         }
     }
 }
@@ -313,7 +284,7 @@ struct SheetOverCard_Previews: PreviewProvider {
             Color.green
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(isPresented: self.$model.isPresented, position: .tall) {
+                .sheetOver(position: .tall) {
 //                    NavigationView {
 //                        List {
 
@@ -348,12 +319,7 @@ struct SheetOverCard_Previews: PreviewProvider {
             ZStack {
                 Color.red
                     .edgesIgnoringSafeArea(.all)
-                    .sheetOver(
-                        isPresented: self.$model.isPresented,
-                        position: .short,
-                        dismissable: true,
-                        allowedPositions: [.tall, .short]
-                    ) {
+                    .sheetOver(position: .short, allowedPositions: [.tall, .short]) {
                         List {
                             Text("hihi")
                             Text("hihi")
