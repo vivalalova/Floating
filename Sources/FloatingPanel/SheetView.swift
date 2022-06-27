@@ -178,9 +178,15 @@ extension Floating.SheetView {
     }
 }
 
+// MARK: - Preview
+
+import MapKit
+
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
         @Published var position: Floating.CardPosition = .short
+        @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+        @Published var text = ""
     }
 
     @StateObject static var model = Model()
@@ -189,7 +195,6 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Color.green
                 .previewDisplayName("tall")
-                .edgesIgnoringSafeArea(.all)
                 .sheetOver(position: $model.position) {
                     NavigationView {
                         List {
@@ -201,21 +206,27 @@ struct SheetOverCard_Previews: PreviewProvider {
                     }.padding(.top)
                 }
 
-            ZStack {
-                Color.red
-                    .edgesIgnoringSafeArea(.all)
-                    .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
-                        List {
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                            Text("hihi")
-                        }
+            Color.red
+                .edgesIgnoringSafeArea(.all)
+                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
+                    List {
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
+                        Text("hihi")
                     }
-            }
+                }
+
+            Map(coordinateRegion: $model.region)
+                .edgesIgnoringSafeArea(.all)
+                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
+                    TextField("請輸入", text: $model.text)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                }
 
             NavigationView {
                 List {
