@@ -4,11 +4,11 @@
 
 import SwiftUI
 
-public enum Floating {}
-
 public
-struct SheetView<Content: View>: View {
-    @State var position: CardPosition
+enum Floating {
+    public
+    struct SheetView<Content: View>: View {
+        @Binding var position: CardPosition
 //    {
 //        didSet {
 //            if self.position == .close {
@@ -19,75 +19,41 @@ struct SheetView<Content: View>: View {
 //        }
 //    }
 
-    @State private var animated = true
+        let allowedPositions: [CardPosition]
 
-    /// return if close
-    @State private var didTapTop: () -> Bool = { true }
+        var content: () -> Content
 
-    let allowedPositions: [SheetView<Content>.CardPosition]
-
-    var content: () -> Content
-
-    @GestureState private var dragState = DragState.inactive
-
-    public
-    var body: some View {
-        GeometryReader { reader in
-            let size = reader.size
-
-            VStack(spacing: 0) { // card
-                VStack(spacing: 0) {
-                    self.content()
-                    Spacer()
-                }
-                .frame(
-                    width: size.width,
-                    height: size.height
-                )
-
-                Spacer()
-            }
-            .overlay(TopBar(), alignment: .top)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(UIColor.systemBackground.color)
-            .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
-            .shadow(color: self.shadowColor, radius: 10.0)
-            .offset(
-                x: self.offset(proxy: reader).x,
-                y: self.offset(readerHeight: size.height)
-            )
-            .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
-            .gesture(self.drag(readerHeight: size.height))
-            .background(self.background(proxy: reader))
-        }
-        .border(Color.red, width: 5)
-    }
-
-    public
-    enum CardPosition {
-        case full
-        case tall
-        case compact
-        case short
-        case closed
-
-        case custom(toTop: CGFloat)
+        @GestureState private var dragState = DragState.inactive
 
         public
-        func distance(readerHeight: CGFloat) -> CGFloat {
-            switch self {
-            case .full:
-                return 0
-            case .tall:
-                return 80
-            case .compact:
-                return readerHeight * 0.5
-            case .short:
-                return readerHeight - 200
-            case .closed:
-                return readerHeight
-            case let .custom(toTop):
-                return toTop
+        var body: some View {
+            GeometryReader { reader in
+                let size = reader.size
+
+                VStack(spacing: 0) { // card
+                    VStack(spacing: 0) {
+                        self.content()
+                        Spacer()
+                    }
+                    .frame(
+                        width: size.width,
+                        height: size.height
+                    )
+
+                    Spacer()
+                }
+                .overlay(TopBar(), alignment: .top)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(UIColor.systemBackground.color)
+                .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
+                .shadow(color: self.shadowColor, radius: 10.0)
+                .offset(
+                    x: self.offset(proxy: reader).x,
+                    y: self.offset(readerHeight: size.height)
+                )
+                .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
+                .gesture(self.drag(readerHeight: size.height))
+                .background(self.background(proxy: reader))
             }
         }
     }
@@ -96,7 +62,7 @@ struct SheetView<Content: View>: View {
 // MARK: - Animation
 
 private
-extension SheetView {
+extension Floating.SheetView {
     /// 移回銀幕左側
     /// - Parameter proxy: GeometryProxy
     /// - Returns: 用來修正的offset
@@ -117,7 +83,7 @@ extension SheetView {
     /// shadowColor
     private var shadowColor: Color { Color(.sRGBLinear, white: 0, opacity: 0.13) }
 
-    private typealias DragCB = _EndedGesture<_ChangedGesture<GestureStateGesture<DragGesture, SheetView<Content>.DragState>>>
+    private typealias DragCB = _EndedGesture<_ChangedGesture<GestureStateGesture<DragGesture, DragState>>>
     private func drag(readerHeight: CGFloat) -> DragCB {
         DragGesture()
             .updating(self.$dragState) { drag, state, _ in
@@ -130,11 +96,11 @@ extension SheetView {
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
                 let cardTopEdgeLocation = self.position.distance(readerHeight: readerHeight) + drag.translation.height
-                let fromPosition: CardPosition
-                let toPosition: CardPosition
-                let closestPosition: CardPosition
+                let fromPosition: Floating.CardPosition
+                let toPosition: Floating.CardPosition
+                let closestPosition: Floating.CardPosition
 
-                if cardTopEdgeLocation <= CardPosition.compact.distance(readerHeight: readerHeight) {
+                if cardTopEdgeLocation <= Floating.CardPosition.compact.distance(readerHeight: readerHeight) {
                     fromPosition = .tall
                     toPosition = .compact
                 } else {
@@ -159,7 +125,7 @@ extension SheetView {
     }
 
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
-        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == CardPosition.short.distance(readerHeight: readerHeight) {
+        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == Floating.CardPosition.short.distance(readerHeight: readerHeight) {
             return 0
         }
 
@@ -168,35 +134,35 @@ extension SheetView {
 
         return Double(min(opacity, alpha))
     }
+}
 
-    private enum DragState {
-        case inactive
-        case dragging(translation: CGSize)
+private enum DragState {
+    case inactive
+    case dragging(translation: CGSize)
 
-        var translation: CGSize {
-            switch self {
-            case .inactive:
-                return .zero
-            case let .dragging(translation):
-                return translation
-            }
+    var translation: CGSize {
+        switch self {
+        case .inactive:
+            return .zero
+        case let .dragging(translation):
+            return translation
         }
+    }
+}
+
+private struct TopBar: View {
+    var body: some View {
+        Color.gray
+            .frame(width: 40, height: 5.0)
+            .clipShape(Capsule())
+            .padding(5)
     }
 }
 
 // MARK: - SubViews
 
 private
-extension SheetView {
-    private struct TopBar: View {
-        var body: some View {
-            Color.gray
-                .frame(width: 40, height: 5.0)
-                .clipShape(Capsule())
-                .padding(5)
-        }
-    }
-
+extension Floating.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         Color.black
             .offset(
@@ -214,7 +180,7 @@ extension SheetView {
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position: SheetView<AnyView>.CardPosition = .short
+        @Published var position: Floating.CardPosition = .short
     }
 
     @StateObject static var model = Model()
@@ -224,21 +190,21 @@ struct SheetOverCard_Previews: PreviewProvider {
             Color.green
                 .previewDisplayName("tall")
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: .tall) {
+                .sheetOver(position: $model.position) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
                                 Text("hihi")
                             }
                         }
-                        .navigationTitle("hihihi")
-                    }
+                        .navigationTitle("hihihi2")
+                    }.padding(.top)
                 }
 
             ZStack {
                 Color.red
                     .edgesIgnoringSafeArea(.all)
-                    .sheetOver(position: .short, allowedPositions: [.tall, .short]) {
+                    .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
                         List {
                             Text("hihi")
                             Text("hihi")
@@ -261,9 +227,9 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver(position: .tall) {
+            }.sheetOver(position: $model.position) {
                 VStack {
-                    ForEach(1 ..< 50) { _ in
+                    ForEach(1 ..< 10) { _ in
                         Text("hihi")
                     }
                 }
