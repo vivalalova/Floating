@@ -203,7 +203,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                             }
                         }
                         .navigationTitle("hihihi2")
-                    }.padding(.top)
+                    }
                 }
 
             Color.red
