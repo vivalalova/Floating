@@ -8,16 +8,9 @@ public
 enum Floating {
     public
     struct SheetView<Content: View>: View {
+        @Environment(\.floatingTopBarColor) var floatingTopBarColor
+
         @Binding var position: CardPosition
-//    {
-//        didSet {
-//            if self.position == .close {
-//                withAnimation {
-//                    self.forClose = 0
-//                }
-//            }
-//        }
-//    }
 
         let allowedPositions: [CardPosition]
 
@@ -33,6 +26,7 @@ enum Floating {
                 VStack(spacing: 0) { // card
                     VStack(spacing: 0) {
                         self.content()
+
                         Spacer()
                     }
                     .frame(
@@ -42,7 +36,7 @@ enum Floating {
 
                     Spacer()
                 }
-                .overlay(TopBar(), alignment: .top)
+                .overlay(TopBar(color: floatingTopBarColor), alignment: .top)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
@@ -151,8 +145,10 @@ private enum DragState {
 }
 
 private struct TopBar: View {
+    let color: Color
+
     var body: some View {
-        Color.gray
+        color
             .frame(width: 40, height: 5.0)
             .clipShape(Capsule())
             .padding(5)
@@ -195,7 +191,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Color.green
                 .previewDisplayName("tall")
-                .sheetOver(position: $model.position) {
+                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -246,5 +242,26 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
             }
         }
+    }
+}
+
+// MARK: - ooo
+
+public struct TopBarColor: EnvironmentKey {
+    public static let defaultValue: Color = .gray
+}
+
+public
+extension EnvironmentValues {
+    var floatingTopBarColor: Color {
+        get { self[TopBarColor.self] }
+        set { self[TopBarColor.self] = newValue }
+    }
+}
+
+public
+extension View {
+    func floatingTopBarColor(_ floatingTopBarColor: Color) -> some View {
+        environment(\.floatingTopBarColor, floatingTopBarColor)
     }
 }
