@@ -8,8 +8,6 @@ public
 enum Floating {
     public
     struct SheetView<Content: View>: View {
-        @Environment(\.floatingTopBarColor) var floatingTopBarColor
-
         @Binding var position: CardPosition
 
         let allowedPositions: [CardPosition]
@@ -29,20 +27,18 @@ enum Floating {
 
                         Spacer()
                     }
-                    .frame(
-                        width: size.width,
-                        height: size.height
-                    )
+                    .frame(width: size.width, height: size.height)
 
                     Spacer()
                 }
-                .overlay(TopBar(color: floatingTopBarColor), alignment: .top)
+                .overlay(TopBar(color: .gray), alignment: .top)
+                .frame(height: UIScreen.main.bounds.height)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
                 .offset(
-                    x: self.offset(proxy: reader).x,
+                    //                    x: self.offset(proxy: reader).x,
                     y: self.offset(readerHeight: size.height)
                 )
                 .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
@@ -69,7 +65,7 @@ extension Floating.SheetView {
     /// - Parameter readerHeight: geometryProxy.size.height
     /// - Returns: offset.y
     private func offset(readerHeight: CGFloat) -> CGFloat {
-        let distance = self.position.distance(readerHeight: readerHeight)
+        let distance: CGFloat = self.position.distance(readerHeight: readerHeight)
         let delta = self.dragState.translation.height
         return max(distance + delta, 0)
     }
@@ -183,6 +179,15 @@ struct SheetOverCard_Previews: PreviewProvider {
         @Published var position: Floating.CardPosition = .short
         @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         @Published var text = ""
+
+        func enabled() -> Bool {
+            switch self.position {
+            case .tall:
+                return false
+            default:
+                return true
+            }
+        }
     }
 
     @StateObject static var model = Model()
@@ -219,9 +224,11 @@ struct SheetOverCard_Previews: PreviewProvider {
             Map(coordinateRegion: $model.region)
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
-                    TextField("請輸入", text: $model.text)
-                        .textFieldStyle(.roundedBorder)
-                        .padding()
+                    ScrollView {
+                        C()
+                    }
+                    .padding(.top, 20)
+                    .disabled(model.enabled())
                 }
 
             NavigationView {
@@ -242,26 +249,81 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
             }
         }
+
+        ExampleView()
+    }
+
+    struct C: View {
+        var body: some View {
+            VStack {
+                HStack {
+                    Image(systemName: "person")
+                    Text("hihihi")
+
+                    Spacer()
+
+                    Image(systemName: "arrow.down")
+                }
+                .padding(.horizontal)
+
+                Divider()
+
+                VStack {
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                }.font(.largeTitle)
+
+                VStack {
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                }
+                .font(.largeTitle)
+
+                VStack {
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                    Text("hihi")
+                }
+                .font(.largeTitle)
+            }
+        }
     }
 }
 
-// MARK: - ooo
+struct ExampleView: View {
+    @State private var customPreferenceKey = ""
 
-public struct TopBarColor: EnvironmentKey {
-    public static let defaultValue: Color = .gray
-}
+    var body: some View {
+        VStack {
+            Text("View that sets a preference key when loaded")
+                .preference(key: CustomPreferenceKey.self, value: "New value! 🤓")
 
-public
-extension EnvironmentValues {
-    var floatingTopBarColor: Color {
-        get { self[TopBarColor.self] }
-        set { self[TopBarColor.self] = newValue }
+            Text(customPreferenceKey)
+        }
+        .onPreferenceChange(CustomPreferenceKey.self) { (value: CustomPreferenceKey.Value) in
+            customPreferenceKey = value
+        }
     }
 }
 
-public
-extension View {
-    func floatingTopBarColor(_ floatingTopBarColor: Color) -> some View {
-        environment(\.floatingTopBarColor, floatingTopBarColor)
+struct CustomPreferenceKey: PreferenceKey {
+    static var defaultValue = ""
+
+    static func reduce(value: inout String, nextValue: () -> String) {
+        value = nextValue()
     }
 }

@@ -32,14 +32,12 @@ struct SheetViewModifier<T: View>: ViewModifier {
     let content: () -> T
 
     public func body(content: Content) -> some View {
-        ZStack {
-            content
-
-            Floating.SheetView(position: position, allowedPositions: allowedPositions) {
-                self.content()
-            }
-            .edgesIgnoringSafeArea(.all)
-        }
+        content
+            .overlay(
+                Floating.SheetView(position: self.position, allowedPositions: self.allowedPositions) {
+                    self.content()
+                }
+            )
     }
 }
 

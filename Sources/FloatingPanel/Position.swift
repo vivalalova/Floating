@@ -19,12 +19,16 @@ extension Floating {
         case custom(toTop: CGFloat)
 
         public
+
+        /// Top Distance to SafeArea
+        /// - Parameter readerHeight: self height
+        /// - Returns: distance to safe area
         func distance(readerHeight: CGFloat) -> CGFloat {
             switch self {
             case .full:
                 return 0
             case .tall:
-                return 80
+                return 0
             case .compact:
                 return readerHeight * 0.5
             case .short:
