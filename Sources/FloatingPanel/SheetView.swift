@@ -80,8 +80,7 @@ extension Floating.SheetView {
                 state = .dragging(translation: drag.translation)
             }
             .onChanged { _ in
-                print("ooo")
-//                self.height = readerHeight - self.position.distance(readerHeight: readerHeight)
+                // nothing
             }
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
@@ -249,8 +248,6 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
             }
         }
-
-        ExampleView()
     }
 
     struct C: View {
@@ -301,29 +298,5 @@ struct SheetOverCard_Previews: PreviewProvider {
                 .font(.largeTitle)
             }
         }
-    }
-}
-
-struct ExampleView: View {
-    @State private var customPreferenceKey = ""
-
-    var body: some View {
-        VStack {
-            Text("View that sets a preference key when loaded")
-                .preference(key: CustomPreferenceKey.self, value: "New value! 🤓")
-
-            Text(customPreferenceKey)
-        }
-        .onPreferenceChange(CustomPreferenceKey.self) { (value: CustomPreferenceKey.Value) in
-            customPreferenceKey = value
-        }
-    }
-}
-
-struct CustomPreferenceKey: PreferenceKey {
-    static var defaultValue = ""
-
-    static func reduce(value: inout String, nextValue: () -> String) {
-        value = nextValue()
     }
 }

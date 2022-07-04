@@ -16,9 +16,8 @@ extension Floating {
         case short
         case closed
 
-        case custom(toTop: CGFloat)
-
-        public
+        case toTop(_ distance: CGFloat)
+        case toBottom(_ distance: CGFloat)
 
         /// Top Distance to SafeArea
         /// - Parameter readerHeight: self height
@@ -28,15 +27,17 @@ extension Floating {
             case .full:
                 return 0
             case .tall:
-                return 0
+                return 80
             case .compact:
                 return readerHeight * 0.5
             case .short:
                 return readerHeight - 200
             case .closed:
                 return readerHeight
-            case let .custom(toTop):
-                return toTop
+            case let .toTop(distance):
+                return distance
+            case let .toBottom(distance):
+                return readerHeight - distance
             }
         }
     }
