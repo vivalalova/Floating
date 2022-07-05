@@ -2,6 +2,7 @@
 //  Created by lova on 2020/10/20.
 //
 
+import Combine
 import SwiftUI
 
 public
@@ -9,6 +10,7 @@ enum Floating {
     public
     struct SheetView<Content: View>: View {
         @Binding var position: CardPosition
+        @State var positionListener: CardPosition? = nil
 
         let allowedPositions: [CardPosition]
 
@@ -44,6 +46,10 @@ enum Floating {
                 .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
                 .gesture(self.drag(readerHeight: size.height))
                 .background(self.background(proxy: reader))
+            }
+            .onChange(of: position) { newValue in
+                positionListener = newValue
+                self.position = newValue
             }
         }
     }
@@ -175,12 +181,14 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position: Floating.CardPosition = .short
+        @Published var tallPosition: Floating.CardPosition = .tall
+        @Published var shortPosition: Floating.CardPosition = .short
+
         @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         @Published var text = ""
 
         func enabled() -> Bool {
-            switch self.position {
+            switch self.tallPosition {
             case .tall:
                 return false
             default:
@@ -195,7 +203,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Color.green
                 .previewDisplayName("tall")
-                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.tallPosition, allowedPositions: [.tall, .short]) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -208,7 +216,7 @@ struct SheetOverCard_Previews: PreviewProvider {
 
             Color.red
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.shortPosition, allowedPositions: [.tall, .short]) {
                     List {
                         Text("hihi")
                         Text("hihi")
@@ -222,7 +230,7 @@ struct SheetOverCard_Previews: PreviewProvider {
 
             Map(coordinateRegion: $model.region)
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.position, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.shortPosition, allowedPositions: [.tall, .short]) {
                     ScrollView {
                         C()
                     }
@@ -240,7 +248,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver(position: $model.position) {
+            }.sheetOver(position: $model.shortPosition) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")

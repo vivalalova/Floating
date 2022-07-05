@@ -9,7 +9,7 @@ import SwiftUI
 
 public
 extension Floating {
-    enum CardPosition {
+    enum CardPosition: Equatable {
         case full
         case tall
         case compact
