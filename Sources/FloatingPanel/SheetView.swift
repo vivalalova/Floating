@@ -10,7 +10,6 @@ enum Floating {
     public
     struct SheetView<Content: View>: View {
         @Binding var position: CardPosition
-        @State var positionListener: CardPosition? = nil
 
         let allowedPositions: [CardPosition]
 
@@ -48,7 +47,6 @@ enum Floating {
                 .background(self.background(proxy: reader))
             }
             .onChange(of: position) { newValue in
-                positionListener = newValue
                 self.position = newValue
             }
         }
