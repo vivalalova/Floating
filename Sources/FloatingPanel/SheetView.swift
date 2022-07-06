@@ -39,7 +39,7 @@ enum Floating {
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
                 .offset(
-                    //                    x: self.offset(proxy: reader).x,
+                    // x: self.offset(proxy: reader).x,
                     y: self.offset(readerHeight: size.height)
                 )
                 .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
@@ -47,7 +47,9 @@ enum Floating {
                 .background(self.background(proxy: reader))
             }
             .onChange(of: position) { newValue in
-                self.position = newValue
+                if self.position != newValue {
+                    self.position = newValue
+                }
             }
         }
     }
@@ -160,10 +162,10 @@ private
 extension Floating.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         Color.black
-            .offset(
-                x: self.offset(proxy: proxy).x,
-                y: self.offset(proxy: proxy).y
-            )
+//            .offset(
+//                x: self.offset(proxy: proxy).x,
+//                y: self.offset(proxy: proxy).y
+//            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
