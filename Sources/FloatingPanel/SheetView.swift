@@ -11,7 +11,7 @@ enum Floating {
     struct SheetView<Content: View>: View {
         @Binding var position: CardPosition
 
-        let allowedPositions: [CardPosition]
+        @Binding var allowedPositions: [CardPosition]
 
         var content: () -> Content
 
@@ -47,8 +47,10 @@ enum Floating {
                 .background(self.background(proxy: reader))
             }
             .onChange(of: position) { newValue in
-                if self.position != newValue {
-                    self.position = newValue
+                DispatchQueue.main.async {
+                    if self.position != newValue {
+                        self.position = newValue
+                    }
                 }
             }
         }
@@ -203,7 +205,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Color.green
                 .previewDisplayName("tall")
-                .sheetOver(position: $model.tallPosition, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.tallPosition, allowedPositions: .constant([.tall, .short])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -216,7 +218,7 @@ struct SheetOverCard_Previews: PreviewProvider {
 
             Color.red
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.shortPosition, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .short])) {
                     List {
                         Text("hihi")
                         Text("hihi")
@@ -230,7 +232,7 @@ struct SheetOverCard_Previews: PreviewProvider {
 
             Map(coordinateRegion: $model.region)
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.shortPosition, allowedPositions: [.tall, .short]) {
+                .sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .short])) {
                     ScrollView {
                         C()
                     }
@@ -248,7 +250,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver(position: $model.shortPosition) {
+            }.sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .toTop(120)])) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")

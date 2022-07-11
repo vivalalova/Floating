@@ -11,7 +11,7 @@ public
 extension View {
     func sheetOver<T: View>(
         position: Binding<Floating.CardPosition>,
-        allowedPositions: [Floating.CardPosition] = [.tall, .compact, .short],
+        allowedPositions: Binding<[Floating.CardPosition]> = .constant([.tall, .compact, .short]),
         content: @escaping () -> T
     ) -> some View {
         self.modifier(
@@ -27,7 +27,7 @@ extension View {
 public
 struct SheetViewModifier<T: View>: ViewModifier {
     let position: Binding<Floating.CardPosition>
-    let allowedPositions: [Floating.CardPosition]
+    let allowedPositions: Binding<[Floating.CardPosition]>
 
     let content: () -> T
 
