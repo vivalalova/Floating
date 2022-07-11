@@ -225,7 +225,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
 
             Color.green
-                .sheetOver($model.higherPosition, allowed: .constant([.tall, .short])) {
+                .sheetOver($model.lowerPosition, allowed: .constant([.full, .toBottom(240)])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -246,7 +246,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver($model.lowerPosition, allowed: .constant([.full, .toBottom(240)])) {
+            }.sheetOver($model.lowerPosition, allowed: .constant([.toTop(120), .toBottom(240)])) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")
