@@ -32,7 +32,7 @@ enum Floating {
 
                     Spacer()
                 }
-                .overlay(TopBar(color: .gray), alignment: .top)
+                .overlay(TopBar(color: .gray).padding(4), alignment: .top)
                 .frame(height: UIScreen.main.bounds.height)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(UIColor.systemBackground.color)
@@ -206,20 +206,6 @@ struct SheetOverCard_Previews: PreviewProvider {
                             }
                         }
                         .navigationTitle("hihihi2")
-                    }
-                }
-
-            Color.red
-                .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .short])) {
-                    List {
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
-                        Text("hihi")
                     }
                 }
 
