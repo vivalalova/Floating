@@ -1,5 +1,5 @@
 import XCTest
-@testable import FloatingPanel
+@testable import SheetOver
 
 final class FloatingPanelTests: XCTestCase {
     func testExample() throws {
