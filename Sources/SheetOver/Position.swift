@@ -8,7 +8,7 @@
 import SwiftUI
 
 public
-extension Floating {
+extension SheetOver {
     enum CardPosition: Equatable {
         case full
         case tall

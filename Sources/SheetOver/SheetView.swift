@@ -6,7 +6,7 @@ import Combine
 import SwiftUI
 
 public
-enum Floating {
+enum SheetOver {
     public
     struct SheetView<Content: View>: View {
         @Binding var position: CardPosition
@@ -60,7 +60,7 @@ enum Floating {
 // MARK: - Animation
 
 private
-extension Floating.SheetView {
+extension SheetOver.SheetView {
     /// 移回銀幕左側
     /// - Parameter proxy: GeometryProxy
     /// - Returns: 用來修正的offset
@@ -115,7 +115,7 @@ extension Floating.SheetView {
     }
 
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
-        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == Floating.CardPosition.short.distance(readerHeight: readerHeight) {
+        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.CardPosition.short.distance(readerHeight: readerHeight) {
             return 0
         }
 
@@ -154,7 +154,7 @@ private struct TopBar: View {
 // MARK: - SubViews
 
 private
-extension Floating.SheetView {
+extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         Color.black
 //            .offset(
@@ -176,8 +176,8 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var tallPosition: Floating.CardPosition = .tall
-        @Published var shortPosition: Floating.CardPosition = .toBottom(240)
+        @Published var tallPosition: SheetOver.CardPosition = .tall
+        @Published var shortPosition: SheetOver.CardPosition = .toBottom(240)
 
         @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         @Published var text = ""
