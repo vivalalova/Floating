@@ -10,7 +10,7 @@ import SwiftUI
 public
 extension View {
     func sheetOver<T: View>(
-        position: Binding<Floating.CardPosition>,
+        _ position: Binding<Floating.CardPosition>,
         allowedPositions: Binding<[Floating.CardPosition]> = .constant([.tall, .half, .short]),
         content: @escaping () -> T
     ) -> some View {

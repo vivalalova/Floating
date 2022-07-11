@@ -177,28 +177,58 @@ import MapKit
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
         @Published var tallPosition: Floating.CardPosition = .tall
-        @Published var shortPosition: Floating.CardPosition = .short
+        @Published var shortPosition: Floating.CardPosition = .toBottom(240)
 
         @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         @Published var text = ""
-
-        func enabled() -> Bool {
-            switch self.tallPosition {
-            case .tall:
-                return false
-            default:
-                return true
-            }
-        }
     }
 
     @StateObject static var model = Model()
 
     static var previews: some View {
         Group {
+            Map(coordinateRegion: $model.region)
+                .edgesIgnoringSafeArea(.all)
+                .sheetOver($model.shortPosition, allowedPositions: .constant([.tall, .toBottom(240)])) {
+                    ScrollView {
+                        LazyVStack {
+                            HStack {
+                                Image(systemName: "person")
+                                Text("username")
+
+                                Spacer()
+
+                                Button {
+                                    if self.model.shortPosition == .tall {
+                                        self.model.shortPosition = .toBottom(240)
+                                    } else {
+                                        self.model.shortPosition = .tall
+                                    }
+                                } label: {
+                                    if self.model.shortPosition == .toBottom(240) {
+                                        Image(systemName: "arrow.down")
+                                    } else {
+                                        Image(systemName: "arrow.up")
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+
+                            Divider()
+
+                            Divider()
+
+                            ForEach(1 ..< 100) { _ in
+                                Text("hihi")
+                                    .font(.largeTitle)
+                            }
+                        }
+                    }
+                    .padding(.top, 20)
+                }
+
             Color.green
-                .previewDisplayName("tall")
-                .sheetOver(position: $model.tallPosition, allowedPositions: .constant([.tall, .short])) {
+                .sheetOver($model.tallPosition, allowedPositions: .constant([.tall, .short])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -207,16 +237,6 @@ struct SheetOverCard_Previews: PreviewProvider {
                         }
                         .navigationTitle("hihihi2")
                     }
-                }
-
-            Map(coordinateRegion: $model.region)
-                .edgesIgnoringSafeArea(.all)
-                .sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .short])) {
-                    ScrollView {
-                        C()
-                    }
-                    .padding(.top, 20)
-                    .disabled(model.enabled())
                 }
 
             NavigationView {
@@ -229,62 +249,12 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver(position: $model.shortPosition, allowedPositions: .constant([.tall, .toTop(120)])) {
+            }.sheetOver($model.shortPosition, allowedPositions: .constant([.tall, .toTop(120)])) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")
                     }
                 }
-            }
-        }
-    }
-
-    struct C: View {
-        var body: some View {
-            VStack {
-                HStack {
-                    Image(systemName: "person")
-                    Text("hihihi")
-
-                    Spacer()
-
-                    Image(systemName: "arrow.down")
-                }
-                .padding(.horizontal)
-
-                Divider()
-
-                VStack {
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                }.font(.largeTitle)
-
-                VStack {
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                }
-                .font(.largeTitle)
-
-                VStack {
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                }
-                .font(.largeTitle)
             }
         }
     }
