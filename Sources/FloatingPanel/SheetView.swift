@@ -92,31 +92,24 @@ extension Floating.SheetView {
             }
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
-                let cardTopEdgeLocation = self.position.distance(readerHeight: readerHeight) + drag.translation.height
-                let fromPosition: Floating.CardPosition
-                let toPosition: Floating.CardPosition
-                let closestPosition: Floating.CardPosition
+//                let cardTopEdgeLocation = self.position.distance(readerHeight: readerHeight) + drag.translation.height
+//                let fromPosition: Floating.CardPosition
+//                let toPosition: Floating.CardPosition
+//                let closestPosition: Floating.CardPosition
 
-                if cardTopEdgeLocation <= Floating.CardPosition.compact.distance(readerHeight: readerHeight) {
-                    fromPosition = .tall
-                    toPosition = .compact
-                } else {
-                    fromPosition = .compact
-                    toPosition = .short
+                self.allowedPositions
+                    .sort { a, b in a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight) }
+
+                guard let index = self.allowedPositions.firstIndex(of: self.position) else {
+                    return
                 }
 
-                if (cardTopEdgeLocation - fromPosition.distance(readerHeight: readerHeight)) < (toPosition.distance(readerHeight: readerHeight) - cardTopEdgeLocation) {
-                    closestPosition = fromPosition
+                if verticalDirection < 0, index - 1 >= 0, self.allowedPositions.count > index - 1 { // 變高
+                    self.position = self.allowedPositions[index - 1]
+                } else if verticalDirection > 0, self.allowedPositions.count > index + 1 { // 變矮
+                    self.position = self.allowedPositions[index + 1]
                 } else {
-                    closestPosition = toPosition
-                }
-
-                if verticalDirection > 0 { // 變矮
-                    self.position = toPosition
-                } else if verticalDirection < 0 { // 變高
-                    self.position = fromPosition
-                } else {
-                    self.position = closestPosition
+                    //
                 }
             }
     }
