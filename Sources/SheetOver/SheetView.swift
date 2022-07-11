@@ -176,8 +176,7 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var higherPosition: SheetOver.Position = .tall
-        @Published var lowerPosition: SheetOver.Position = .toBottom(240)
+        @Published var position: SheetOver.Position = .toBottom(240)
     }
 
     @StateObject static var model = Model()
@@ -186,7 +185,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.lowerPosition, allowed: .constant([.tall, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: .constant([.tall, .toBottom(240)])) {
                     VStack {
                         HStack {
                             Image(systemName: "person")
@@ -194,16 +193,16 @@ struct SheetOverCard_Previews: PreviewProvider {
 
                             Spacer()
 
-                            Button {
-                                if self.model.lowerPosition == .tall {
-                                    self.model.lowerPosition = .toBottom(240)
-                                } else {
-                                    self.model.lowerPosition = .tall
-                                }
-                            } label: {
-                                if self.model.lowerPosition == .toBottom(240) {
+                            if self.model.position == .tall {
+                                Button {
+                                    self.model.position = .toBottom(240)
+                                } label: {
                                     Image(systemName: "arrow.down")
-                                } else {
+                                }
+                            } else if self.model.position == .toBottom(240) {
+                                Button {
+                                    self.model.position = .tall
+                                } label: {
                                     Image(systemName: "arrow.up")
                                 }
                             }
@@ -214,7 +213,7 @@ struct SheetOverCard_Previews: PreviewProvider {
 
                         ScrollView {
                             LazyVStack {
-                                ForEach(1 ..< 100) { _ in
+                                ForEach(1 ..< 50) { _ in
                                     Text("hihi")
                                         .font(.largeTitle)
                                 }
@@ -225,7 +224,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
 
             Color.green
-                .sheetOver($model.lowerPosition, allowed: .constant([.full, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: .constant([.full, .toBottom(240)])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -246,7 +245,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver($model.lowerPosition, allowed: .constant([.toTop(120), .toBottom(240)])) {
+            }.sheetOver($model.position, allowed: .constant([.toTop(120), .toBottom(240)])) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")
