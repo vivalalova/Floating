@@ -9,7 +9,7 @@ import SwiftUI
 
 public
 extension SheetOver {
-    enum CardPosition: Equatable {
+    enum Position: Equatable {
         case full
         case tall
         case half

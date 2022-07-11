@@ -9,9 +9,9 @@ public
 enum SheetOver {
     public
     struct SheetView<Content: View>: View {
-        @Binding var position: CardPosition
+        @Binding var position: Position
 
-        @Binding var allowedPositions: [CardPosition]
+        @Binding var allowed: [Position]
 
         var content: () -> Content
 
@@ -97,17 +97,17 @@ extension SheetOver.SheetView {
 //                let toPosition: Floating.CardPosition
 //                let closestPosition: Floating.CardPosition
 
-                self.allowedPositions
+                self.allowed
                     .sort { a, b in a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight) }
 
-                guard let index = self.allowedPositions.firstIndex(of: self.position) else {
+                guard let index = self.allowed.firstIndex(of: self.position) else {
                     return
                 }
 
-                if verticalDirection < 0, index - 1 >= 0, self.allowedPositions.count > index - 1 { // 變高
-                    self.position = self.allowedPositions[index - 1]
-                } else if verticalDirection > 0, self.allowedPositions.count > index + 1 { // 變矮
-                    self.position = self.allowedPositions[index + 1]
+                if verticalDirection < 0, index - 1 >= 0, self.allowed.count > index - 1 { // 變高
+                    self.position = self.allowed[index - 1]
+                } else if verticalDirection > 0, self.allowed.count > index + 1 { // 變矮
+                    self.position = self.allowed[index + 1]
                 } else {
                     //
                 }
@@ -115,7 +115,7 @@ extension SheetOver.SheetView {
     }
 
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
-        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.CardPosition.short.distance(readerHeight: readerHeight) {
+        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.Position.short.distance(readerHeight: readerHeight) {
             return 0
         }
 
@@ -176,51 +176,48 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var tallPosition: SheetOver.CardPosition = .tall
-        @Published var shortPosition: SheetOver.CardPosition = .toBottom(240)
-
-        @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
-        @Published var text = ""
+        @Published var higherPosition: SheetOver.Position = .tall
+        @Published var lowerPosition: SheetOver.Position = .toBottom(240)
     }
 
     @StateObject static var model = Model()
 
     static var previews: some View {
         Group {
-            Map(coordinateRegion: $model.region)
+            Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.shortPosition, allowedPositions: .constant([.tall, .toBottom(240)])) {
-                    ScrollView {
-                        LazyVStack {
-                            HStack {
-                                Image(systemName: "person")
-                                Text("username")
+                .sheetOver($model.lowerPosition, allowed: .constant([.tall, .toBottom(240)])) {
+                    VStack {
+                        HStack {
+                            Image(systemName: "person")
+                            Text("username")
 
-                                Spacer()
+                            Spacer()
 
-                                Button {
-                                    if self.model.shortPosition == .tall {
-                                        self.model.shortPosition = .toBottom(240)
-                                    } else {
-                                        self.model.shortPosition = .tall
-                                    }
-                                } label: {
-                                    if self.model.shortPosition == .toBottom(240) {
-                                        Image(systemName: "arrow.down")
-                                    } else {
-                                        Image(systemName: "arrow.up")
-                                    }
+                            Button {
+                                if self.model.lowerPosition == .tall {
+                                    self.model.lowerPosition = .toBottom(240)
+                                } else {
+                                    self.model.lowerPosition = .tall
+                                }
+                            } label: {
+                                if self.model.lowerPosition == .toBottom(240) {
+                                    Image(systemName: "arrow.down")
+                                } else {
+                                    Image(systemName: "arrow.up")
                                 }
                             }
-                            .padding(.horizontal)
+                        }
+                        .padding(.horizontal)
 
-                            Divider()
+                        Divider()
 
-                            Divider()
-
-                            ForEach(1 ..< 100) { _ in
-                                Text("hihi")
-                                    .font(.largeTitle)
+                        ScrollView {
+                            LazyVStack {
+                                ForEach(1 ..< 100) { _ in
+                                    Text("hihi")
+                                        .font(.largeTitle)
+                                }
                             }
                         }
                     }
@@ -228,7 +225,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
 
             Color.green
-                .sheetOver($model.tallPosition, allowedPositions: .constant([.tall, .short])) {
+                .sheetOver($model.higherPosition, allowed: .constant([.tall, .short])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -249,7 +246,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                     Text("hihi")
                     Text("hihi")
                 }
-            }.sheetOver($model.shortPosition, allowedPositions: .constant([.tall, .toTop(120)])) {
+            }.sheetOver($model.lowerPosition, allowed: .constant([.full, .toBottom(240)])) {
                 VStack {
                     ForEach(1 ..< 10) { _ in
                         Text("hihi")

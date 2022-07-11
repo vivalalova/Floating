@@ -10,24 +10,20 @@ import SwiftUI
 public
 extension View {
     func sheetOver<T: View>(
-        _ position: Binding<SheetOver.CardPosition>,
-        allowedPositions: Binding<[SheetOver.CardPosition]> = .constant([.tall, .half, .short]),
+        _ position: Binding<SheetOver.Position>,
+        allowed: Binding<[SheetOver.Position]> = .constant([.tall, .half, .short]),
         content: @escaping () -> T
     ) -> some View {
         self.modifier(
-            SheetViewModifier(
-                position: position,
-                allowedPositions: allowedPositions,
-                content: content
-            )
+            SheetViewModifier(position: position, allowed: allowed, content: content)
         )
     }
 }
 
 public
 struct SheetViewModifier<T: View>: ViewModifier {
-    let position: Binding<SheetOver.CardPosition>
-    let allowedPositions: Binding<[SheetOver.CardPosition]>
+    let position: Binding<SheetOver.Position>
+    let allowed: Binding<[SheetOver.Position]>
 
     let content: () -> T
 
@@ -35,7 +31,7 @@ struct SheetViewModifier<T: View>: ViewModifier {
         ZStack {
             content
 
-            SheetOver.SheetView(position: position, allowedPositions: allowedPositions) {
+            SheetOver.SheetView(position: position, allowed: allowed) {
                 self.content()
             }
             .edgesIgnoringSafeArea(.all)
