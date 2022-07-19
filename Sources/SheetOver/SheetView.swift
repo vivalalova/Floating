@@ -195,37 +195,16 @@ struct SheetOverCard_Previews: PreviewProvider {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
                 .sheetOver($model.position, allowed: .constant([.tall, .toBottom(240)])) {
-                    VStack {
-                        HStack {
-                            Image(systemName: "person")
-                            Text("username")
-
-                            Spacer()
-
-                            if self.model.position == .tall {
-                                Button {
-                                    self.model.position = .toBottom(240)
-                                } label: {
-                                    Image(systemName: "arrow.down")
-                                }
-                            } else if self.model.position == .toBottom(240) {
-                                Button {
-                                    self.model.position = .tall
-                                } label: {
-                                    Image(systemName: "arrow.up")
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
+                    VStack(spacing: 0) {
+                        Text("title")
+                            .font(.title)
 
                         Divider()
 
-                        ScrollView {
-                            LazyVStack {
-                                ForEach(1 ..< 50) { _ in
-                                    Text("hihi")
-                                        .font(.largeTitle)
-                                }
+                        LazyVStack {
+                            ForEach(1 ..< 5) { _ in
+                                Text("hihi")
+                                    .font(.largeTitle)
                             }
                         }
                     }
