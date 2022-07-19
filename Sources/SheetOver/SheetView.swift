@@ -234,8 +234,8 @@ struct SheetOverCard_Previews: PreviewProvider {
                         }
                     }
                     .padding(.top, 20)
-                    .sheetOver(topBarColor: .accentColor)
-                    .sheetOver(backgroundColor: .clear)
+                    .sheetOverTopBarColor(.accentColor)
+                    .sheetOverBackgroundColor(.clear)
                 }
 
             Color.green

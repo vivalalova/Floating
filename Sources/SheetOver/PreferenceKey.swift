@@ -22,8 +22,8 @@ struct TopBarColorPreferenceKey: PreferenceKey {
 public
 extension View {
     /// TopBar 的顏色
-    func sheetOver(topBarColor: Color) -> some View {
-        self.preference(key: TopBarColorPreferenceKey.self, value: topBarColor)
+    func sheetOverTopBarColor(_ color: Color) -> some View {
+        self.preference(key: TopBarColorPreferenceKey.self, value: color)
     }
 }
 
@@ -42,7 +42,7 @@ struct SheetOverBackgroundColorPreferenceKey: PreferenceKey {
 public
 extension View {
     /// 背後變黑的顏色
-    func sheetOver(backgroundColor: Color) -> some View {
-        self.preference(key: SheetOverBackgroundColorPreferenceKey.self, value: backgroundColor)
+    func sheetOverBackgroundColor(_ color: Color) -> some View {
+        self.preference(key: SheetOverBackgroundColorPreferenceKey.self, value: color)
     }
 }
