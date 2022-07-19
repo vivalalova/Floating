@@ -29,14 +29,10 @@ enum SheetOver {
                     VStack(spacing: 0) {
                         self.content()
                             .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
-                                if topBarColor != color {
-                                    topBarColor = color
-                                }
+                                topBarColor = color
                             }
                             .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
-                                if backgroundColor != color {
-                                    backgroundColor = color
-                                }
+                                backgroundColor = color
                             }
 
                         Spacer()
