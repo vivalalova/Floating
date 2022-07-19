@@ -17,6 +17,9 @@ enum SheetOver {
 
         @GestureState private var dragState = DragState.inactive
 
+        @State private var topBarColor: Color = .gray
+        @State private var backgroundColor: Color = .black
+
         public
         var body: some View {
             GeometryReader { reader in
@@ -25,6 +28,12 @@ enum SheetOver {
                 VStack(spacing: 0) { // card
                     VStack(spacing: 0) {
                         self.content()
+                            .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
+                                topBarColor = color
+                            }
+                            .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
+                                backgroundColor = color
+                            }
 
                         Spacer()
                     }
@@ -32,7 +41,7 @@ enum SheetOver {
 
                     Spacer()
                 }
-                .overlay(TopBar(color: .gray).padding(4), alignment: .top)
+                .overlay(TopBar(color: topBarColor).padding(4), alignment: .top)
                 .frame(height: UIScreen.main.bounds.height)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(UIColor.systemBackground.color)
@@ -156,7 +165,7 @@ private struct TopBar: View {
 private
 extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
-        Color.black
+        self.backgroundColor
 //            .offset(
 //                x: self.offset(proxy: proxy).x,
 //                y: self.offset(proxy: proxy).y
@@ -221,6 +230,8 @@ struct SheetOverCard_Previews: PreviewProvider {
                         }
                     }
                     .padding(.top, 20)
+                    .sheetOverTopBarColor(.accentColor)
+                    .sheetOverBackgroundColor(.clear)
                 }
 
             Color.green
