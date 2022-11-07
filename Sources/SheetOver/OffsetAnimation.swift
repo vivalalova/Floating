@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OffsetAnimation: ViewModifier, Animatable {
+struct OffsetAnimation: GeometryEffect {
     typealias T = CGFloat
     var animatableData: T {
         didSet {
@@ -31,14 +31,15 @@ struct OffsetAnimation: ViewModifier, Animatable {
 
     var onCompletion: () -> Void
 
-    func body(content: Content) -> some View {
-        content.offset(x: 0, y: self.targetValue)
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        ProjectionTransform(CGAffineTransform(translationX: 0, y: self.animatableData))
     }
 }
 
 extension View {
     func offsetAnimation(value: CGFloat, completed: @escaping () -> Void) -> some View {
-        self.modifier(OffsetAnimation(value: value, onCompletion: completed))
-            .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
+        self
+            .modifier(OffsetAnimation(value: value, onCompletion: completed))
+            .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0), value: value)
     }
 }

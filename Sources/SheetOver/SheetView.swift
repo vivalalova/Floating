@@ -45,11 +45,12 @@ enum SheetOver {
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
-                .offsetAnimation(value: self.offset(readerHeight: size.height), completed: {
-                    print("Translation end")
-                })
-                .gesture(self.drag(readerHeight: size.height))
                 .background(self.background(proxy: reader))
+                .offsetAnimation(value: self.offset(readerHeight: size.height)) {
+                    print("Translation end")
+                }
+                .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
+                .gesture(self.drag(readerHeight: size.height))
             }
             .onChange(of: position) { newValue in
                 DispatchQueue.main.async {
@@ -62,7 +63,7 @@ enum SheetOver {
     }
 }
 
-// MARK: - Animation
+// MARK: - Drag
 
 private
 extension SheetOver.SheetView {
