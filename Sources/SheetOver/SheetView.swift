@@ -45,7 +45,9 @@ enum SheetOver {
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
-                .offsetAnimation(value: self.offset(readerHeight: size.height)) {}
+                .offsetAnimation(value: self.offset(readerHeight: size.height), completed: {
+                    print("Translation end")
+                })
                 .gesture(self.drag(readerHeight: size.height))
                 .background(self.background(proxy: reader))
             }
@@ -95,13 +97,8 @@ extension SheetOver.SheetView {
             }
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
-//                let cardTopEdgeLocation = self.position.distance(readerHeight: readerHeight) + drag.translation.height
-//                let fromPosition: Floating.CardPosition
-//                let toPosition: Floating.CardPosition
-//                let closestPosition: Floating.CardPosition
 
-                self.allowed
-                    .sort { a, b in a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight) }
+                self.allowed.sort { a, b in a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight) }
 
                 guard let index = self.allowed.firstIndex(of: self.position) else {
                     return
