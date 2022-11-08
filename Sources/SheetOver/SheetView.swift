@@ -17,8 +17,10 @@ enum SheetOver {
 
         @GestureState private var dragState = DragState.inactive
 
+        // PreferenceKeys
         @State private var topBarColor: Color = .gray
         @State private var backgroundColor: Color = .black
+        @State private var animationCompletedClosure: () -> Void = {}
 
         public
         var body: some View {
@@ -29,10 +31,13 @@ enum SheetOver {
                     VStack(spacing: 0) {
                         self.content()
                             .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
-                                topBarColor = color
+                                self.topBarColor = color
                             }
                             .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
-                                backgroundColor = color
+                                self.backgroundColor = color
+                            }
+                            .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
+                                self.animationCompletedClosure = wrapped.closure
                             }
 
                         Spacer()
@@ -46,7 +51,7 @@ enum SheetOver {
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
                 .offsetAnimation(value: self.offset(readerHeight: size.height)) {
-                    print("Translation end")
+                    animationCompletedClosure()
                 }
                 .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
                 .gesture(self.drag(readerHeight: size.height))
@@ -201,8 +206,8 @@ struct SheetOverCard_Previews: PreviewProvider {
                         }
                     }
                     .padding(.top, 20)
-                    .sheetOverTopBarColor(.accentColor)
-                    .sheetOverBackgroundColor(.clear)
+                    .sheetOverTopBarColor(.red)
+                    .sheetOverBackgroundColor(.blue)
                 }
 
             Color.green
