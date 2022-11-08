@@ -29,7 +29,9 @@ struct AnimationCompletedPreferenceKey: PreferenceKey {
 
 public extension View {
     func sheetOverAnimationCompleted(_ offsetAnimationCompleted: @escaping () -> Void) -> some View {
-        self
-            .preference(key: AnimationCompletedPreferenceKey.self, value: Wrapper(closure: offsetAnimationCompleted))
+        self.preference(
+            key: AnimationCompletedPreferenceKey.self,
+            value: Wrapper(closure: offsetAnimationCompleted)
+        )
     }
 }
