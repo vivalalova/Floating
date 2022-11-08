@@ -21,6 +21,7 @@ enum SheetOver {
         @State private var topBarColor: Color = .gray
         @State private var backgroundColor: Color = .black
         @State private var animationCompletedClosure: () -> Void = {}
+        @State private var backgroundOnTapClosure: () -> Void = {}
 
         public
         var body: some View {
@@ -39,7 +40,10 @@ enum SheetOver {
                             .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
                                 self.animationCompletedClosure = wrapped.closure
                             }
-
+                            .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
+                                self.backgroundOnTapClosure = wrapped.closure
+                            }
+                        
                         Spacer()
                     }
 
@@ -170,7 +174,7 @@ extension SheetOver.SheetView {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
-                print("maybe should close")
+                self.backgroundOnTapClosure()
             }
             .edgesIgnoringSafeArea(.all)
     }

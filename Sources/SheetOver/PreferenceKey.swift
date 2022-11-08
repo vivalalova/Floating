@@ -46,3 +46,55 @@ extension View {
         self.preference(key: SheetOverBackgroundColorPreferenceKey.self, value: color)
     }
 }
+
+// MARK: - OffsetAnimationCompleted
+
+typealias Closure = () -> Void
+
+struct Wrapper: Equatable {
+    static func == (lhs: Wrapper, rhs: Wrapper) -> Bool {
+        true
+    }
+
+    var closure: Closure = {}
+}
+
+struct AnimationCompletedPreferenceKey: PreferenceKey {
+    typealias Value = Wrapper
+
+    static var defaultValue = Value()
+
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value = nextValue()
+    }
+}
+
+public extension View {
+    func sheetOverAnimationCompleted(_ offsetAnimationCompleted: @escaping () -> Void) -> some View {
+        self.preference(
+            key: AnimationCompletedPreferenceKey.self,
+            value: Wrapper(closure: offsetAnimationCompleted)
+        )
+    }
+}
+
+// MARK: - On Background Tap
+
+struct BackgroundTapPreferenceKey: PreferenceKey {
+    typealias Value = Wrapper
+
+    static var defaultValue = Value()
+
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value = nextValue()
+    }
+}
+
+public extension View {
+    func sheetOverBackgroundOnTap(_ onTap: @escaping () -> Void) -> some View {
+        self.preference(
+            key: BackgroundTapPreferenceKey.self,
+            value: Wrapper(closure: onTap)
+        )
+    }
+}
