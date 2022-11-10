@@ -28,38 +28,13 @@ enum SheetOver {
             GeometryReader { reader in
                 let size = reader.size
 
-                VStack(spacing: 0) { // card
-                    VStack(spacing: 0) {
-                        self.content()
-                            .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
-                                self.topBarColor = color
-                            }
-                            .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
-                                self.backgroundColor = color
-                            }
-                            .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
-                                self.animationCompletedClosure = wrapped.closure
-                            }
-                            .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
-                                self.backgroundOnTapClosure = wrapped.closure
-                            }
-                        
-                        Spacer()
+                Sheet(size.height)
+                    .shadow(color: self.shadowColor, radius: 10.0)
+                    .offsetAnimation(value: self.offset(readerHeight: size.height)) {
+                        animationCompletedClosure()
                     }
-
-                    Spacer()
-                }
-                .overlay(TopBar(color: topBarColor).padding(4), alignment: .top)
-                .frame(height: UIScreen.main.bounds.height - self.offset(readerHeight: size.height))
-                .background(UIColor.systemBackground.color)
-                .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
-                .shadow(color: self.shadowColor, radius: 10.0)
-                .offsetAnimation(value: self.offset(readerHeight: size.height)) {
-                    animationCompletedClosure()
-                }
-                .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
-                .gesture(self.drag(readerHeight: size.height))
-                .background(self.background(proxy: reader))
+                    .gesture(self.drag(readerHeight: size.height))
+                    .background(self.background(proxy: reader))
             }
             .onChange(of: position) { newValue in
                 DispatchQueue.main.async {
@@ -68,6 +43,30 @@ enum SheetOver {
                     }
                 }
             }
+        }
+
+        private func Sheet(_ proxyHeight: CGFloat) -> some View {
+            VStack(spacing: 0) { // card
+                self.content()
+                    .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
+                        self.topBarColor = color
+                    }
+                    .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
+                        self.backgroundColor = color
+                    }
+                    .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
+                        self.animationCompletedClosure = wrapped.closure
+                    }
+                    .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
+                        self.backgroundOnTapClosure = wrapped.closure
+                    }
+
+                Spacer()
+            }
+            .overlay(TopBar(color: self.topBarColor), alignment: .top)
+            .frame(height: UIScreen.main.bounds.height - self.offset(readerHeight: proxyHeight))
+            .background(UIColor.systemBackground.color)
+            .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
         }
     }
 }
@@ -134,30 +133,19 @@ extension SheetOver.SheetView {
 
         return Double(min(opacity, alpha))
     }
-}
 
-private enum DragState {
-    case inactive
-    case dragging(translation: CGSize)
+    private enum DragState {
+        case inactive
+        case dragging(translation: CGSize)
 
-    var translation: CGSize {
-        switch self {
-        case .inactive:
-            return .zero
-        case let .dragging(translation):
-            return translation
+        var translation: CGSize {
+            switch self {
+            case .inactive:
+                return .zero
+            case let .dragging(translation):
+                return translation
+            }
         }
-    }
-}
-
-private struct TopBar: View {
-    let color: Color
-
-    var body: some View {
-        color
-            .frame(width: 40, height: 5.0)
-            .clipShape(Capsule())
-            .padding(5)
     }
 }
 
@@ -165,12 +153,19 @@ private struct TopBar: View {
 
 private
 extension SheetOver.SheetView {
+    private struct TopBar: View {
+        let color: Color
+
+        var body: some View {
+            color
+                .frame(width: 40, height: 5.0)
+                .clipShape(Capsule())
+                .padding(9)
+        }
+    }
+
     private func background(proxy: GeometryProxy) -> some View {
         self.backgroundColor
-//            .offset(
-//                x: self.offset(proxy: proxy).x,
-//                y: self.offset(proxy: proxy).y
-//            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
