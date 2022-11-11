@@ -29,23 +29,19 @@ enum SheetOver {
                 let size = reader.size
 
                 VStack(spacing: 0) { // card
-                    VStack(spacing: 0) {
-                        self.content()
-                            .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
-                                self.topBarColor = color
-                            }
-                            .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
-                                self.backgroundColor = color
-                            }
-                            .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
-                                self.animationCompletedClosure = wrapped.closure
-                            }
-                            .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
-                                self.backgroundOnTapClosure = wrapped.closure
-                            }
-                        
-                        Spacer()
-                    }
+                    self.content()
+                        .onPreferenceChange(TopBarColorPreferenceKey.self) { color in
+                            self.topBarColor = color
+                        }
+                        .onPreferenceChange(SheetOverBackgroundColorPreferenceKey.self) { color in
+                            self.backgroundColor = color
+                        }
+                        .onPreferenceChange(AnimationCompletedPreferenceKey.self) { wrapped in
+                            self.animationCompletedClosure = wrapped.closure
+                        }
+                        .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
+                            self.backgroundOnTapClosure = wrapped.closure
+                        }
 
                     Spacer()
                 }
@@ -167,10 +163,6 @@ private
 extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         self.backgroundColor
-//            .offset(
-//                x: self.offset(proxy: proxy).x,
-//                y: self.offset(proxy: proxy).y
-//            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
