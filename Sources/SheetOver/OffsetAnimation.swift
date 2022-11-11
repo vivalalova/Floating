@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OffsetAnimation: GeometryEffect {
     typealias T = CGFloat
-    
     var animatableData: T {
         didSet {
             self.animatableDataSetAction()
