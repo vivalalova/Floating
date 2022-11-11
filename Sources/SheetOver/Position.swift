@@ -10,13 +10,13 @@ import SwiftUI
 public
 extension SheetOver {
     enum Position: Equatable {
-        case full
-        case tall
-        case half
-        case short
+        case full(scrollable: Bool = false)
+        case tall(scrollable: Bool = false)
+        case half(scrollable: Bool = false)
+        case short(scrollable: Bool = false)
 
-        case toTop(_ distance: CGFloat)
-        case toBottom(_ distance: CGFloat)
+        case toTop(_ distance: CGFloat, scrollable: Bool = false)
+        case toBottom(_ distance: CGFloat, scrollable: Bool = false)
 
         case closed
 
@@ -33,9 +33,9 @@ extension SheetOver {
                 return readerHeight * 0.5
             case .short:
                 return readerHeight - 200
-            case let .toTop(distance):
+            case let .toTop(distance, scrollable):
                 return distance
-            case let .toBottom(distance):
+            case let .toBottom(distance, scrollable):
                 return readerHeight - distance
             case .closed:
                 return readerHeight

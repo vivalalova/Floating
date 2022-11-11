@@ -121,7 +121,7 @@ extension SheetOver.SheetView {
     }
 
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
-        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.Position.short.distance(readerHeight: readerHeight) {
+        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.Position.short().distance(readerHeight: readerHeight) {
             return 0
         }
 
@@ -187,7 +187,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.position, allowed: .constant([.tall, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: .constant([.tall(), .toBottom(240)])) {
                     VStack(spacing: 0) {
                         Text("title")
                             .font(.title)
@@ -207,7 +207,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
 
             Color.green
-                .sheetOver($model.position, allowed: .constant([.full, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: .constant([.full(), .toBottom(240)])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
