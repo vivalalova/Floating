@@ -92,3 +92,11 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
         }
     }
 }
+
+public extension View {
+    func sheetOverScrollable(scrollable: Binding<Bool>) -> some View {
+        ScrollInSheetOverView(scrollable: scrollable) {
+            self
+        }
+    }
+}

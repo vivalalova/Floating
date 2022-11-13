@@ -178,7 +178,8 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position: SheetOver.Position = .toBottom(240)
+        @Published var position: SheetOver.Position = .short(scrollable: true)
+        @Published var allowed: [SheetOver.Position] = [.tall(scrollable: true), .short(scrollable: true)]
     }
 
     @StateObject static var model = Model()
@@ -187,7 +188,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.position, allowed: .constant([.tall(), .toBottom(240)])) {
+                .sheetOver($model.position, allowed: $model.allowed) {
                     VStack(spacing: 0) {
                         Text("title")
                             .font(.title)
@@ -195,7 +196,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                         Divider()
 
                         LazyVStack {
-                            ForEach(1 ..< 5) { _ in
+                            ForEach(1 ..< 55) { _ in
                                 Text("hihi")
                                     .font(.largeTitle)
                             }

@@ -33,12 +33,26 @@ extension SheetOver {
                 return readerHeight * 0.5
             case .short:
                 return readerHeight - 200
-            case let .toTop(distance, scrollable):
+            case let .toTop(distance, _):
                 return distance
-            case let .toBottom(distance, scrollable):
+            case let .toBottom(distance, _):
                 return readerHeight - distance
             case .closed:
                 return readerHeight
+            }
+        }
+
+        public var isScrollable: Bool {
+            switch self {
+            case let .full(scrollable),
+                 let .tall(scrollable),
+                 let .half(scrollable),
+                 let .short(scrollable),
+                 let .toTop(_, scrollable),
+                 let .toBottom(_, scrollable):
+                return scrollable
+            case .closed:
+                return false
             }
         }
     }
