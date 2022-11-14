@@ -7,6 +7,21 @@
 
 import SwiftUI
 
+// MARK: - EnvironmentValues
+
+extension EnvironmentValues {
+    private struct Scrolls: EnvironmentKey {
+        static let defaultValue: Binding<Bool> = .constant(true)
+    }
+
+    var Scrollable: Binding<Bool> {
+        get { self[Scrolls.self] }
+        set { self[Scrolls.self] = newValue }
+    }
+}
+
+// MARK: - MYScrollView
+
 public
 class MYScrollView: UIScrollView {
     @Binding var isNeedsScroll: Bool
@@ -33,13 +48,12 @@ public
 struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
     public typealias ScrollViewType = MYScrollView
 
-    @Binding var scrollable: Bool
+    @Environment(\.Scrollable) var scrollable
 
     var content: Content
 
     public
-    init(scrollable: Binding<Bool> = .constant(true), @ViewBuilder content: @escaping () -> Content) {
-        self._scrollable = scrollable
+    init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content()
     }
 
@@ -69,15 +83,17 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
 
     public
     func updateUIView(_ uiView: ScrollViewType, context: Context) {
-        uiView.isScrollEnabled = self.scrollable && self.needsScroll
+        uiView.isScrollEnabled = self.scrollable.wrappedValue && self.needsScroll
     }
 
     public
     func makeCoordinator() -> Coordinator {
-        Coordinator(scrollable: self.$scrollable)
+        Coordinator(scrollable: self.scrollable)
     }
+}
 
-    public
+public
+extension ScrollInSheetOverView {
     class Coordinator: NSObject, UIScrollViewDelegate {
         @Binding var scrollable: Bool
 
@@ -93,9 +109,10 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
     }
 }
 
-public extension View {
-    func sheetOverScrollable(scrollable: Binding<Bool>) -> some View {
-        ScrollInSheetOverView(scrollable: scrollable) {
+public
+extension View {
+    func sheetOverScrollable() -> some View {
+        ScrollInSheetOverView {
             self
         }
     }

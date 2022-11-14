@@ -23,6 +23,15 @@ enum SheetOver {
         @State private var animationCompletedClosure: () -> Void = {}
         @State private var backgroundOnTapClosure: () -> Void = {}
 
+        @State var scrollable = true
+        private func resetIfScrollable() {
+            let isPositionScrollable = self.position.isScrollable
+
+            if isPositionScrollable != self.scrollable {
+                self.scrollable = isPositionScrollable
+            }
+        }
+
         public
         var body: some View {
             GeometryReader { reader in
@@ -42,6 +51,7 @@ enum SheetOver {
                         .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
                             self.backgroundOnTapClosure = wrapped.closure
                         }
+                        .environment(\.Scrollable, $scrollable)
 
                     Spacer()
                 }
@@ -51,6 +61,7 @@ enum SheetOver {
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
                 .offsetAnimation(value: self.offset(readerHeight: size.height)) {
+                    self.resetIfScrollable()
                     animationCompletedClosure()
                 }
                 .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
