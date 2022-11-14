@@ -44,6 +44,8 @@ class MYScrollView: UIScrollView {
     }
 }
 
+// MARK: - ScrollInSheetOverView
+
 public
 struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
     public typealias ScrollViewType = MYScrollView
@@ -92,6 +94,8 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
     }
 }
 
+// MARK: - Coordinator
+
 public
 extension ScrollInSheetOverView {
     class Coordinator: NSObject, UIScrollViewDelegate {
@@ -111,6 +115,7 @@ extension ScrollInSheetOverView {
 
 public
 extension View {
+    /// 內容高度會大於Sheet高度時使用
     func sheetOverScrollable() -> some View {
         ScrollInSheetOverView {
             self
