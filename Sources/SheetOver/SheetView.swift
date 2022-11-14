@@ -24,13 +24,6 @@ enum SheetOver {
         @State private var backgroundOnTapClosure: () -> Void = {}
 
         @State var scrollable = true
-        private func resetIfScrollable() {
-            let isPositionScrollable = self.position.isScrollable
-
-            if isPositionScrollable != self.scrollable {
-                self.scrollable = isPositionScrollable
-            }
-        }
 
         public
         var body: some View {
@@ -74,6 +67,16 @@ enum SheetOver {
                         self.position = newValue
                     }
                 }
+            }
+        }
+
+        /// 手放開的動畫完成時從 position 判斷該錨點是否要改變scrollable狀態
+        /// 如果外部有使用sheetOverScrollable來套scrollview才會有實際作用
+        private func resetIfScrollable() {
+            let isPositionScrollable = self.position.isScrollable
+
+            if isPositionScrollable != self.scrollable {
+                self.scrollable = isPositionScrollable
             }
         }
     }

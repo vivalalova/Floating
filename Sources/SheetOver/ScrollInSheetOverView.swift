@@ -10,37 +10,13 @@ import SwiftUI
 // MARK: - EnvironmentValues
 
 extension EnvironmentValues {
-    private struct Scrolls: EnvironmentKey {
+    private struct IfScrolls: EnvironmentKey {
         static let defaultValue: Binding<Bool> = .constant(true)
     }
 
     var Scrollable: Binding<Bool> {
-        get { self[Scrolls.self] }
-        set { self[Scrolls.self] = newValue }
-    }
-}
-
-// MARK: - MYScrollView
-
-public
-class MYScrollView: UIScrollView {
-    @Binding var isNeedsScroll: Bool
-
-    init(isNeedsScroll: Binding<Bool>) {
-        self._isNeedsScroll = isNeedsScroll
-        super.init(frame: .zero)
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override public
-    var frame: CGRect {
-        didSet {
-            self.isNeedsScroll = self.contentSize.height > self.frame.size.height
-        }
+        get { self[IfScrolls.self] }
+        set { self[IfScrolls.self] = newValue }
     }
 }
 
@@ -48,9 +24,14 @@ class MYScrollView: UIScrollView {
 
 public
 struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
-    public typealias ScrollViewType = MYScrollView
+    public
+    typealias ScrollViewType = MYScrollView
 
+    /// SheetView那邊 allowed的錨點位置是否可scroll
     @Environment(\.Scrollable) var scrollable
+
+    /// scrollview 內容長度是否大於frame.size.height
+    @State var isContentSizeHigherThanFrameSize = false
 
     var content: Content
 
@@ -59,11 +40,9 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
         self.content = content()
     }
 
-    @State var needsScroll = false
-
     public
     func makeUIView(context: Context) -> ScrollViewType {
-        let scrollView = ScrollViewType(isNeedsScroll: $needsScroll)
+        let scrollView = ScrollViewType($isContentSizeHigherThanFrameSize)
 
         scrollView.isScrollEnabled = true
         scrollView.automaticallyAdjustsScrollIndicatorInsets = false
@@ -85,7 +64,7 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
 
     public
     func updateUIView(_ uiView: ScrollViewType, context: Context) {
-        uiView.isScrollEnabled = self.scrollable.wrappedValue && self.needsScroll
+        uiView.isScrollEnabled = self.scrollable.wrappedValue && self.isContentSizeHigherThanFrameSize
     }
 
     public
@@ -94,7 +73,35 @@ struct ScrollInSheetOverView<Content: View>: UIViewRepresentable {
     }
 }
 
-// MARK: - Coordinator
+// MARK: - MYScrollView
+
+public
+extension ScrollInSheetOverView {
+    /// 幫UIScrollView加上判斷
+    class MYScrollView: UIScrollView {
+        @Binding var isContentSizeHigherThanFrameSize: Bool
+
+        init(_ isContentSizeHigherThanFrameSize: Binding<Bool>) {
+            self._isContentSizeHigherThanFrameSize = isContentSizeHigherThanFrameSize
+            super.init(frame: .zero)
+        }
+
+        @available(*, unavailable)
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override public
+        var frame: CGRect {
+            didSet {
+                // FIXME: Modifying state during view update, this will cause undefined behavior.
+                self.isContentSizeHigherThanFrameSize = self.contentSize.height > self.frame.size.height
+            }
+        }
+    }
+}
+
+// MARK: - Coordinator of UIScrollViewDelegate
 
 public
 extension ScrollInSheetOverView {
