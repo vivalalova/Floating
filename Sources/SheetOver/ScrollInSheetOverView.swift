@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+// MARK: - Extension for View
+
+public
+extension View {
+    /// 內容高度會大於Sheet高度時使用, 讓他內容可以往下推或可以Scroll
+    func sheetOverScrollable() -> some View {
+        ScrollInSheetOverView {
+            self
+        }
+    }
+}
+
 // MARK: - EnvironmentValues
 
 extension EnvironmentValues {
@@ -108,24 +120,28 @@ extension ScrollInSheetOverView {
     class Coordinator: NSObject, UIScrollViewDelegate {
         @Binding var scrollable: Bool
 
+        @State var lastContentOffset: CGFloat = 0
+
         init(scrollable: Binding<Bool>) {
             self._scrollable = scrollable
+        }
+
+        public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            self.lastContentOffset = scrollView.contentOffset.x
         }
 
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             if scrollView.contentOffset.y < 0 {
                 self.scrollable = false
             }
-        }
-    }
-}
 
-public
-extension View {
-    /// 內容高度會大於Sheet高度時使用
-    func sheetOverScrollable() -> some View {
-        ScrollInSheetOverView {
-            self
+            if self.lastContentOffset > scrollView.contentOffset.x {
+                print("up")
+            } else if self.lastContentOffset < scrollView.contentOffset.x {
+                print("down")
+            } else {
+                // didn't move
+            }
         }
     }
 }

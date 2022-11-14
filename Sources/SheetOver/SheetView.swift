@@ -50,14 +50,15 @@ enum SheetOver {
                 }
                 .overlay(TopBar(color: topBarColor).padding(4), alignment: .top)
                 .frame(height: UIScreen.main.bounds.height - self.offset(readerHeight: size.height))
+
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
+
                 .offsetAnimation(value: self.offset(readerHeight: size.height)) {
                     self.resetIfScrollable()
                     animationCompletedClosure()
                 }
-                .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
                 .gesture(self.drag(readerHeight: size.height))
                 .background(self.background(proxy: reader))
             }
@@ -177,7 +178,6 @@ private
 extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         self.backgroundColor
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
                 self.backgroundOnTapClosure()
@@ -215,6 +215,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                                     .font(.largeTitle)
                             }
                         }
+                        .sheetOverScrollable()
                     }
                     .padding(.top, 20)
                     .sheetOverTopBarColor(.red)

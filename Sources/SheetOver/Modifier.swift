@@ -28,14 +28,13 @@ struct SheetViewModifier<T: View>: ViewModifier {
     let content: () -> T
 
     public func body(content: Content) -> some View {
-        ZStack {
-            content
-
-            SheetOver.SheetView(position: position, allowed: allowed) {
-                self.content()
-            }
-            .edgesIgnoringSafeArea(.all)
-        }
+        content
+            .overlay(
+                SheetOver.SheetView(position: self.position, allowed: self.allowed) {
+                    self.content()
+                }
+                .edgesIgnoringSafeArea(.all)
+            )
     }
 }
 
