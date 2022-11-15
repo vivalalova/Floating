@@ -17,24 +17,24 @@
 
 ```swift
 SomeView()
-	.sheetOver($model.position, allowed: $model.allowed) {
-			VStack(spacing: 0) {
-					Text("title").font(.title)
+  .sheetOver($model.position, allowed: $model.allowed) {
+    VStack(spacing: 0) {
+      Text("title").font(.title)
 
-					Divider()
+      Divider()
 
-					LazyVStack {
-							ForEach(1 ..< 55) { _ in
-									Text("hihi")
-											.font(.largeTitle)
-							}
-					}
-					// scroll at .tall because .tall(scrollable: true) at allowed
-					// or just false for long contentSize.height
-					.sheetOverScrollable()
-			}
-			.padding(.top, 20)
-			.sheetOverTopBarColor(.red)
-			.sheetOverBackgroundColor(.blue)
-	}
+      LazyVStack {
+        ForEach(1 ..< 55) { _ in
+          Text("hihi")
+            .font(.largeTitle)
+        }
+      }
+      // scroll at .tall because .tall(scrollable: true) at allowed
+      // or just false for long contentSize.height
+      .sheetOverScrollable()
+    }
+    .padding(.top, 20)
+    .sheetOverTopBarColor(.red)
+    .sheetOverBackgroundColor(.blue)
+  }
 ```
