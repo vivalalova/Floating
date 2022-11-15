@@ -192,8 +192,8 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position: SheetOver.Position = .short(scrollable: true)
-        @Published var allowed: [SheetOver.Position] = [.tall(scrollable: true), .short(scrollable: true)]
+        @Published var position: SheetOver.Position = .short()
+        @Published var allowed: [SheetOver.Position] = [.tall(scrollable: true), .half(), .short()]
     }
 
     @StateObject static var model = Model()
