@@ -11,7 +11,7 @@ public
 extension View {
     func sheetOver<T: View>(
         _ position: Binding<SheetOver.Position>,
-        allowed: Binding<[SheetOver.Position]> = .constant([.tall, .half, .short]),
+        allowed: Binding<[SheetOver.Position]> = .constant([.tall(), .half(), .short()]),
         content: @escaping () -> T
     ) -> some View {
         self.modifier(
@@ -28,14 +28,13 @@ struct SheetViewModifier<T: View>: ViewModifier {
     let content: () -> T
 
     public func body(content: Content) -> some View {
-        ZStack {
-            content
-
-            SheetOver.SheetView(position: position, allowed: allowed) {
-                self.content()
-            }
-            .edgesIgnoringSafeArea(.all)
-        }
+        content
+            .overlay(
+                SheetOver.SheetView(position: self.position, allowed: self.allowed) {
+                    self.content()
+                }
+                .edgesIgnoringSafeArea(.all)
+            )
     }
 }
 

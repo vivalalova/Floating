@@ -23,6 +23,8 @@ enum SheetOver {
         @State private var animationCompletedClosure: () -> Void = {}
         @State private var backgroundOnTapClosure: () -> Void = {}
 
+        @State var scrollable = true
+
         public
         var body: some View {
             GeometryReader { reader in
@@ -42,18 +44,21 @@ enum SheetOver {
                         .onPreferenceChange(BackgroundTapPreferenceKey.self) { wrapped in
                             self.backgroundOnTapClosure = wrapped.closure
                         }
+                        .environment(\.Scrollable, $scrollable)
 
                     Spacer()
                 }
                 .overlay(TopBar(color: topBarColor).padding(4), alignment: .top)
                 .frame(height: UIScreen.main.bounds.height - self.offset(readerHeight: size.height))
+
                 .background(UIColor.systemBackground.color)
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
+
                 .offsetAnimation(value: self.offset(readerHeight: size.height)) {
+                    self.resetIfScrollable()
                     animationCompletedClosure()
                 }
-                .animation(.interpolatingSpring(stiffness: 300.0, damping: 30.0, initialVelocity: 10.0))
                 .gesture(self.drag(readerHeight: size.height))
                 .background(self.background(proxy: reader))
             }
@@ -63,6 +68,16 @@ enum SheetOver {
                         self.position = newValue
                     }
                 }
+            }
+        }
+
+        /// 手放開的動畫完成時從 position 判斷該錨點是否要改變scrollable狀態
+        /// 如果外部有使用sheetOverScrollable來套scrollview才會有實際作用
+        private func resetIfScrollable() {
+            let isPositionScrollable = self.position.isScrollable
+
+            if isPositionScrollable != self.scrollable {
+                self.scrollable = isPositionScrollable
             }
         }
     }
@@ -121,7 +136,7 @@ extension SheetOver.SheetView {
     }
 
     private func backgroundOpacity(readerHeight: CGFloat) -> Double {
-        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.Position.short.distance(readerHeight: readerHeight) {
+        if self.position.distance(readerHeight: readerHeight) + self.dragState.translation.height == SheetOver.Position.short().distance(readerHeight: readerHeight) {
             return 0
         }
 
@@ -163,7 +178,6 @@ private
 extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
         self.backgroundColor
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
             .onTapGesture {
                 self.backgroundOnTapClosure()
@@ -178,7 +192,8 @@ import MapKit
 
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
-        @Published var position: SheetOver.Position = .toBottom(240)
+        @Published var position: SheetOver.Position = .short(scrollable: true)
+        @Published var allowed: [SheetOver.Position] = [.tall(scrollable: true), .short(scrollable: true)]
     }
 
     @StateObject static var model = Model()
@@ -187,7 +202,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.position, allowed: .constant([.tall, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: $model.allowed) {
                     VStack(spacing: 0) {
                         Text("title")
                             .font(.title)
@@ -195,11 +210,12 @@ struct SheetOverCard_Previews: PreviewProvider {
                         Divider()
 
                         LazyVStack {
-                            ForEach(1 ..< 5) { _ in
+                            ForEach(1 ..< 55) { _ in
                                 Text("hihi")
                                     .font(.largeTitle)
                             }
                         }
+                        .sheetOverScrollable()
                     }
                     .padding(.top, 20)
                     .sheetOverTopBarColor(.red)
@@ -207,7 +223,7 @@ struct SheetOverCard_Previews: PreviewProvider {
                 }
 
             Color.green
-                .sheetOver($model.position, allowed: .constant([.full, .toBottom(240)])) {
+                .sheetOver($model.position, allowed: .constant([.full(), .toBottom(240)])) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
