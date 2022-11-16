@@ -177,8 +177,12 @@ private struct TopBar: View {
 private
 extension SheetOver.SheetView {
     private func background(proxy: GeometryProxy) -> some View {
-        self.backgroundColor
-            .opacity(self.backgroundOpacity(readerHeight: proxy.size.height))
+        let alpha = max(self.backgroundOpacity(readerHeight: proxy.size.height), 0)
+
+        let color = alpha > 0 ? self.backgroundColor : .clear
+
+        return color
+            .opacity(alpha)
             .onTapGesture {
                 self.backgroundOnTapClosure()
             }
