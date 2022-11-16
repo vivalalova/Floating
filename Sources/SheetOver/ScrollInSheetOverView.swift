@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUIViewRepresentable
 
 // MARK: - Extension for View
 
