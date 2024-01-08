@@ -11,7 +11,7 @@ enum SheetOver {
     struct SheetView<Content: View>: View {
         @Binding var position: Position
 
-        @Binding var allowed: [Position]
+        var allowed: [Position]
 
         var content: () -> Content
 
@@ -119,16 +119,18 @@ extension SheetOver.SheetView {
             .onEnded { [self] drag in
                 let verticalDirection = drag.predictedEndLocation.y - drag.location.y
 
-                self.allowed.sort { a, b in a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight) }
+                let allowed = self.allowed.sorted { a, b in
+                    a.distance(readerHeight: readerHeight) < b.distance(readerHeight: readerHeight)
+                }
 
-                guard let index = self.allowed.firstIndex(of: self.position) else {
+                guard let index = allowed.firstIndex(of: self.position) else {
                     return
                 }
 
-                if verticalDirection < 0, index - 1 >= 0, self.allowed.count > index - 1 { // 變高
-                    self.position = self.allowed[index - 1]
-                } else if verticalDirection > 0, self.allowed.count > index + 1 { // 變矮
-                    self.position = self.allowed[index + 1]
+                if verticalDirection < 0, index - 1 >= 0, allowed.count > index - 1 { // 變高
+                    self.position = allowed[index - 1]
+                } else if verticalDirection > 0, allowed.count > index + 1 { // 變矮
+                    self.position = allowed[index + 1]
                 } else {
                     //
                 }
@@ -147,7 +149,7 @@ extension SheetOver.SheetView {
     }
 }
 
-private enum DragState {
+private enum DragState: Equatable {
     case inactive
     case dragging(translation: CGSize)
 
@@ -197,7 +199,6 @@ import MapKit
 struct SheetOverCard_Previews: PreviewProvider {
     class Model: ObservableObject {
         @Published var position: SheetOver.Position = .short()
-        @Published var allowed: [SheetOver.Position] = [.tall(scrollable: true), .half(), .short()]
     }
 
     @StateObject static var model = Model()
@@ -206,7 +207,7 @@ struct SheetOverCard_Previews: PreviewProvider {
         Group {
             Map(coordinateRegion: .constant(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))))
                 .edgesIgnoringSafeArea(.all)
-                .sheetOver($model.position, allowed: $model.allowed) {
+                .sheetOver(self.$model.position, allowed: [.tall(scrollable: true), .half(), .short()]) {
                     VStack(spacing: 0) {
                         Text("title")
                             .font(.title)
@@ -214,20 +215,31 @@ struct SheetOverCard_Previews: PreviewProvider {
                         Divider()
 
                         LazyVStack {
-                            ForEach(1 ..< 55) { _ in
-                                Text("hihi")
+                            ForEach(1 ..< 55) { i in
+                                Text("hihi \(i)")
                                     .font(.largeTitle)
                             }
                         }
                         .sheetOverScrollable()
                     }
                     .padding(.top, 20)
+                    .overlay(alignment: .topTrailing) {
+                        Button {} label: {
+                            Image(systemName: "person")
+                                .padding()
+                                .background(.white)
+                                .clipped()
+                                .shadow(radius: 10)
+                                .padding()
+                                .offset(y: -80)
+                        }
+                    }
                     .sheetOverTopBarColor(.red)
                     .sheetOverBackgroundColor(.blue)
                 }
 
             Color.green
-                .sheetOver($model.position, allowed: .constant([.full(), .toBottom(240)])) {
+                .sheetOver(self.$model.position, allowed: [.full(), .toBottom(240)]) {
                     NavigationView {
                         List {
                             ForEach(1 ..< 50) { _ in
@@ -238,21 +250,28 @@ struct SheetOverCard_Previews: PreviewProvider {
                     }
                 }
 
-            NavigationView {
-                List {
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                    Text("hihi")
-                }
-            }.sheetOver($model.position, allowed: .constant([.toTop(120), .toBottom(240)])) {
-                VStack {
-                    ForEach(1 ..< 10) { _ in
-                        Text("hihi")
-                    }
+            ZStack {
+                Color(.orange)
+                    .edgesIgnoringSafeArea(.all)
+
+                HStack {
+//                    Color.clear.frame(width: 20)
+
+                    Color.red
+//                        .frame(width: 200, height: 600)
+                        .sheetOver($model.position, allowed: [.short(), .half(), .tall()]) {
+                            VStack {
+                                ForEach(1 ..< 50) { _ in
+                                    Text("hihi")
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
+                            .sheetOverTopBarColor(.red)
+//                            .sheetOverScrollable()
+//                            .sheetOverBackgroundColor(.clear)
+                        }
+
+//                    Spacer()
                 }
             }
         }

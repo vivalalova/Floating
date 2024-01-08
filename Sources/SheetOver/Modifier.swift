@@ -11,7 +11,7 @@ public
 extension View {
     func sheetOver<T: View>(
         _ position: Binding<SheetOver.Position>,
-        allowed: Binding<[SheetOver.Position]> = .constant([.tall(), .half(), .short()]),
+        allowed: [SheetOver.Position] = [.tall(), .half(), .short()],
         content: @escaping () -> T
     ) -> some View {
         self.modifier(
@@ -23,7 +23,7 @@ extension View {
 public
 struct SheetViewModifier<T: View>: ViewModifier {
     let position: Binding<SheetOver.Position>
-    let allowed: Binding<[SheetOver.Position]>
+    let allowed: [SheetOver.Position]
 
     let content: () -> T
 
