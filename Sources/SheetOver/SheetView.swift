@@ -51,7 +51,7 @@ enum SheetOver {
                 .overlay(TopBar(color: topBarColor).padding(4), alignment: .top)
                 .frame(height: UIScreen.main.bounds.height - self.offset(readerHeight: size.height))
 
-                .background(UIColor.systemBackground.color)
+                .background(Color(UIColor.systemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
                 .shadow(color: self.shadowColor, radius: 10.0)
 

@@ -49,14 +49,12 @@ extension View {
 
 // MARK: - OffsetAnimationCompleted
 
-typealias Closure = () -> Void
-
 struct Wrapper: Equatable {
     static func == (lhs: Wrapper, rhs: Wrapper) -> Bool {
         true
     }
 
-    var closure: Closure = {}
+    var closure: () -> Void = {}
 }
 
 struct AnimationCompletedPreferenceKey: PreferenceKey {
